@@ -8,11 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using test_SFF;
 using test_SFF.Data;
 
-/*
-- Det ska gå att ändra hur många studios som kan låna filmen samtidigt
-- Det ska gå att markera att en film är utlånad till en filmstudio (man får inte låna ut den mer än filmen finns tillgänglig (max-antal samtidiga utlåningar)
-- Det ska gå att ändra så att filmen inte längre är utlånad till en viss filmstudio (lämna tillbaka)
-*/
 namespace test_SFF.Controllers
 {
     [Route("api/Movies")]
@@ -26,12 +21,15 @@ namespace test_SFF.Controllers
             _context = context;
         }
 
-        // - Det ska gå att lägga till en ny fysisk eller digital film till databasen
         // POST: api/Movies
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<MovieDTO>> PostMovie(MovieDTO movieDTO)
         {
+            bool isSame = false;
+            isSame = _context.Movies.Any(x => x.Name == movieDTO.Name);
+            if (isSame)
+                return NotFound();
+
             var movie = new Movie
             {
                 Name = movieDTO.Name,
@@ -41,45 +39,19 @@ namespace test_SFF.Controllers
             
             _context.Movies.Add(movie);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetMovie", new { id = movie.Id }, movieDTO);
             // TODO: Returnerar inte rätt Id (det nya).
+            return CreatedAtAction("GetMovie", new { id = movie.Id }, movieDTO);
         }
 
-        // PUT: api/NewMovie/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // PUT: api/Movies/5
         [HttpPut("{id}")]
         public async Task<IActionResult> ChangeAmount(int id, MovieDTO movieDTO)
         {
             var movieOld = await _context.Movies.FindAsync(id);
             if (movieOld == null)
-            {
                 return NotFound();
-            }
 
-/*            var movie = new Movie
-            {
-                Id = id,
-                Name = movieOld.Name,
-                TotalAmount = movieDTO.TotalAmount,
-                PhysicalCopy = movieOld.PhysicalCopy
-            }; */
-        
             movieOld.TotalAmount = movieDTO.TotalAmount;
-
-/*          if (id != movieDTO.Id)
-            {
-                return BadRequest();
-            } */
-            // TODO: Vi måste hämta en Movie från databasen som vi kan jämföra med.
-            // Det vi vill göra: köra en update på det movie-objekt som har "Id = id". Vi vill endast uppdatera "TotalAmount".
-            // Problem: Den uppdaterar alla kolumner även om de inte har något värde; vill endast uppdatera TotalAmount.
-            // Potentiell lösning: läs in objektet från databasen först, skriv in värdena i "movie" och spara.
-//            _context.Entry(movie).State = EntityState.Modified;
-//            _context.Entry(movie).State = EntityState.Unchanged;
-//            _context.Update(movie);
-//            DbSet.
-//            _context.Update
 
             try
             {
@@ -122,6 +94,7 @@ namespace test_SFF.Controllers
                 ReturnDate = moviestudioDTO.ReturnDate,
                 Returned = false
             };
+            // TODO: Man ska kunna låna samma film en gång till ifall den är Returned = True; Sätter bara Returned till false igen.
             //_context.Movies.
             // TODO: Måste kolla ifall det finns några filmer att låna ut; Movie.TotalAmount måste vara > 0 med alla inräknade i MovieStudios.
                 // Movie med Id == MovieId måste ha TotalAmount > 0.
@@ -129,6 +102,7 @@ namespace test_SFF.Controllers
             // TODO: Måste också kolla ifall filmen redan är utlånad till samma studio.
                 // Kolla MovieStudio efter StudioId och MovieId på samma rad. Om det är sant så läggs ingen ny till.
             // TODO: Hårdkoda ett ReturnDate; ta dagens datum + 7 dagar?
+            
             
             if (!MovieExists(moviestudio.MovieId) || !StudioExists(moviestudio.StudioId))
                 return NotFound();

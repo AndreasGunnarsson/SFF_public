@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 namespace test_SFF
 {
     public class Studio
@@ -13,7 +15,9 @@ namespace test_SFF
     public class StudioDTO
     {
         public int Id { get; set; }
+        [StringLength(10)]
         public string Name { get; set; }
+        [StringLength(10)]
         public string Location { get; set; }
     }
 }

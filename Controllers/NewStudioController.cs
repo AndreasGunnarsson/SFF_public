@@ -26,15 +26,78 @@ namespace test_SFF.Controllers
         [HttpPost]
         public async Task<ActionResult<StudioDTO>> PostStudio(StudioDTO studioDTO)
         {
+            bool isSame = false;
+            isSame = _context.Studios.Any(x => x.Name == studioDTO.Name);
+            if (isSame)
+                return NotFound();
+
             var studio = new Studio
             {
                 Name = studioDTO.Name,
                 Location = studioDTO.Location
             };
+
             _context.Studios.Add(studio);
             await _context.SaveChangesAsync();
-
+            // TODO: id fungerar inte; returnerar alltid 0.
             return CreatedAtAction("GetStudio", new { id = studio.Id }, studioDTO);
+        }
+
+        // DELETE: api/Studios/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteStudio(int id)
+        {
+            var studio = await _context.Studios.FindAsync(id);
+            if (studio == null)
+                return NotFound();
+
+            _context.Studios.Remove(studio);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // PUT: api/Studios/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutStudio(int id, StudioDTO studioDTO)
+        {
+            var studioOld = await _context.Studios.FindAsync(id);
+
+            if (studioOld == null)
+                return NotFound();
+
+            // TODO: FIXA DENNA LOGIK! Alternativt ta bort och sätt [Required] i StudioDTO.
+            if (studioOld.Name != studioDTO.Name)
+                studioOld.Name = studioDTO.Name;
+            else
+                studioOld.Name = studioOld.Name;
+            if (studioOld.Location != studioDTO.Location)
+                studioOld.Location = studioDTO.Location;
+            else
+                studioOld.Location = studioOld.Location;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!StudioExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        private bool StudioExists(int id)
+        {
+            return _context.Studios.Any(e => e.Id == id);
         }
 
         // GET: api/NewStudio
@@ -56,58 +119,6 @@ namespace test_SFF.Controllers
             }
 
             return studio;
-        }
-
-        // PUT: api/NewStudio/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutStudio(int id, Studio studio)
-        {
-            if (id != studio.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(studio).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!StudioExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // DELETE: api/NewStudio/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStudio(int id)
-        {
-            var studio = await _context.Studios.FindAsync(id);
-            if (studio == null)
-            {
-                return NotFound();
-            }
-
-            _context.Studios.Remove(studio);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool StudioExists(int id)
-        {
-            return _context.Studios.Any(e => e.Id == id);
         }
     }
 }
