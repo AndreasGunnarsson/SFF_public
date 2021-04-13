@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using test_SFF;
 using test_SFF.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace test_SFF.Controllers
 {
@@ -26,9 +27,11 @@ namespace test_SFF.Controllers
         public async Task<ActionResult<MovieDTO>> PostMovie(MovieDTO movieDTO)
         {
             bool isSame = false;
-            isSame = _context.Movies.Any(x => x.Name == movieDTO.Name);
+            isSame = _context.Movies.Any(x => x.Name == movieDTO.Name && x.PhysicalCopy == movieDTO.PhysicalCopy);
             if (isSame)
                 return NotFound();
+
+            // TODO: De ska kunna ha samma namn men inte samma namn och samma Physical; Kolla ifall "Any" ovanför fungerar os mden ska.
 
             var movie = new Movie
             {

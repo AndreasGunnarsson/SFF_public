@@ -10,7 +10,9 @@ namespace test_SFF
         public string Name { get; set; }
 //      public DateTime Year { get; set; }
         [Range(0, 999)]
+        [Display(Name = "Total Amount")]
         public int TotalAmount { get; set; }
+        [Display(Name = "Physical Copy")]
         public bool PhysicalCopy { get; set; }
         public List<MovieStudio> MovieStudios { get; set; }
 //        public bool DigitalPhysical { get; set; }

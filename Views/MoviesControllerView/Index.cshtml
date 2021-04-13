@@ -1,14 +1,14 @@
-﻿@model IEnumerable<test_SFF.Movie>
+@model IEnumerable<test_SFF.Movie>
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Index";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Below is a list of all movies available in the SFF library.</p>
-</div>
+<h1>Index</h1>
 
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
 <table class="table">
     <thead>
         <tr>
@@ -37,7 +37,9 @@
                 @Html.DisplayFor(modelItem => item.PhysicalCopy)
             </td>
             <td>
-                <img src="~/images/@(item.Name.ToString()).png" class="img" alt="My image" height="200"/>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }
