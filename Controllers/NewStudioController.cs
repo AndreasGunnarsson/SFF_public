@@ -22,7 +22,6 @@ namespace test_SFF.Controllers
         }
 
         // POST: api/Studios
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<StudioDTO>> PostStudio(StudioDTO studioDTO)
         {
@@ -66,16 +65,6 @@ namespace test_SFF.Controllers
             if (studioOld == null)
                 return NotFound();
 
-            // TODO: FIXA DENNA LOGIK! Alternativt ta bort och sätt [Required] i StudioDTO.
-            if (studioOld.Name != studioDTO.Name)
-                studioOld.Name = studioDTO.Name;
-            else
-                studioOld.Name = studioOld.Name;
-            if (studioOld.Location != studioDTO.Location)
-                studioOld.Location = studioDTO.Location;
-            else
-                studioOld.Location = studioOld.Location;
-
             try
             {
                 await _context.SaveChangesAsync();
@@ -100,6 +89,22 @@ namespace test_SFF.Controllers
             return _context.Studios.Any(e => e.Id == id);
         }
 
+        // GET: api/Studio/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Studio>> GetMovieStudio(int id)
+        {
+            var studio = await _context.Studios.FindAsync(id);
+
+            // Måste joina Movie, Studio med MovieStudio för att kunna skriva ut namn på allt.
+                // Skapa en ny list där allt sparas temporärt?
+            if (studio == null)
+            {
+                return NotFound();
+            }
+
+            return studio;
+        }
+
         // GET: api/NewStudio
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Studio>>> GetStudios()
@@ -108,7 +113,7 @@ namespace test_SFF.Controllers
         }
 
         // GET: api/NewStudio/5
-        [HttpGet("{id}")]
+/*        [HttpGet("{id}")]
         public async Task<ActionResult<Studio>> GetStudio(int id)
         {
             var studio = await _context.Studios.FindAsync(id);
@@ -119,6 +124,6 @@ namespace test_SFF.Controllers
             }
 
             return studio;
-        }
+        } */
     }
 }

@@ -52,7 +52,7 @@ namespace test_SFF.Controllers
                 return NotFound();
 
             movieOld.TotalAmount = movieDTO.TotalAmount;
-
+            // Måste man hantera vad som händer med filmer som redan är utlånade?
             try
             {
                 await _context.SaveChangesAsync();
@@ -83,10 +83,15 @@ namespace test_SFF.Controllers
         }
 
         // TODO: Ful route:
+        // - Det ska gå att markera att en film är utlånad till en filmstudio (man får inte låna ut den mer än filmen finns tillgänglig (max-antal samtidiga utlåningar)
         [Route("MS")]       // POST: /api/Movies/MS
         [HttpPost]
         public async Task<ActionResult<MovieStudio>> PostMovieStudio(MovieStudio moviestudioDTO)
         {
+            // Kolla så att MovieStudio.AntalFilmer_i_moviestudioDTO.MovieId (SUM) är < Movie.TotalAmount med samma id som moviestudioDTO.MovieId.
+                // Måste göra en JOIN och returnera helst en bool.
+                // Måste kolla alla
+
             var moviestudio = new MovieStudio
             {
                 MovieId = moviestudioDTO.MovieId,
@@ -94,13 +99,14 @@ namespace test_SFF.Controllers
                 ReturnDate = moviestudioDTO.ReturnDate,
                 Returned = false
             };
-            // TODO: Man ska kunna låna samma film en gång till ifall den är Returned = True; Sätter bara Returned till false igen.
-            //_context.Movies.
+
+            //_context.MovieStudios.
             // TODO: Måste kolla ifall det finns några filmer att låna ut; Movie.TotalAmount måste vara > 0 med alla inräknade i MovieStudios.
                 // Movie med Id == MovieId måste ha TotalAmount > 0.
                 // Vi måste joina MovieStudio ifall och räkna ihop alla MovieId (som är samma som MovieId).
             // TODO: Måste också kolla ifall filmen redan är utlånad till samma studio.
                 // Kolla MovieStudio efter StudioId och MovieId på samma rad. Om det är sant så läggs ingen ny till.
+            // TODO: Man ska kunna låna samma film en gång till ifall den är Returned = True; Sätter bara Returned till false igen.
             // TODO: Hårdkoda ett ReturnDate; ta dagens datum + 7 dagar?
             
             
@@ -112,28 +118,31 @@ namespace test_SFF.Controllers
                 await _context.SaveChangesAsync();
                 return CreatedAtAction("GetMovieStudio", new { id = moviestudioDTO.Id }, moviestudioDTO);
                 // TODO: Denna returnerar inte DTO! Tror att det har att göra med att "GetMovieStudio" är en actionmetod som måste existera.
+                    // Spännande notis är att här fungerar iaf "id" (returnerar rätt id).
             }
         }
         // TODO: Måste finnas snyggare lösning än detta (route):
+        // TODO: Alternativt så ta bara det id som båda (movieid och studioid) använder?
         [HttpDelete("{movieid:int}/{studioid:int}")]   // DELETE: /api/Movies/2/1
         public async Task<IActionResult> ReturnMovie([FromRoute] int movieid, [FromRoute] int studioid)
         {
             // TODO: Problem med denna implementation: eftersom att man tar bort raden med lånad film
             // - Det ska gå att ändra så att filmen inte längre är utlånad till en viss filmstudio (lämna tillbaka).
             
-            //_context.MovieStudios.Where<MovieStudio>() TODO: Denna borde gå att använda direkt istället för LINQ nedanför?
-            IEnumerable<MovieStudio> moviestudiofromdb = await _context.MovieStudios.ToListAsync<MovieStudio>();
-            if (moviestudiofromdb == null)
+            //IEnumerable<MovieStudio> moviestudiofromdb = await _context.MovieStudios.ToListAsync<MovieStudio>();
+            var query = _context.MovieStudios.Where<MovieStudio>(x => x.MovieId == movieid && x.StudioId == studioid).First();
+            // TODO: .Where ovanför gör det den ska men if-satsen under fungerar ej?
+            if (query == null)
             {
                 return NotFound();
             }
-
-            var moviestudioquery =
+            // TODO: Byt ut denna mot en where direkt..
+/*            var moviestudioquery =
                 (from ms in moviestudiofromdb
                 where ms.MovieId == movieid && ms.StudioId == studioid
-                select ms).First();
+                select ms).First(); */
             
-            _context.MovieStudios.Remove(moviestudioquery);
+            _context.MovieStudios.Remove(query);
             await _context.SaveChangesAsync();
 
             return NoContent();
