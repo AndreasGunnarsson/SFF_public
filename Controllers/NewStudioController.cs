@@ -60,10 +60,13 @@ namespace test_SFF.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutStudio(int id, StudioDTO studioDTO)
         {
-            var studioOld = await _context.Studios.FindAsync(id);
+            var studioBefore = await _context.Studios.FindAsync(id);
 
-            if (studioOld == null)
+            if (studioBefore == null)
                 return NotFound();
+
+            studioBefore.Name = studioDTO.Name;
+            studioBefore.Location = studioDTO.Location;
 
             try
             {
@@ -89,6 +92,7 @@ namespace test_SFF.Controllers
             return _context.Studios.Any(e => e.Id == id);
         }
 
+        // TODO: För att hämta vilka filmer en viss förening har lånat.
         // GET: api/Studio/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Studio>> GetMovieStudio(int id)

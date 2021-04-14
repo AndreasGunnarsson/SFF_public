@@ -31,8 +31,6 @@ namespace test_SFF.Controllers
             if (isSame)
                 return NotFound();
 
-            // TODO: De ska kunna ha samma namn men inte samma namn och samma Physical; Kolla ifall "Any" ovanför fungerar os mden ska.
-
             var movie = new Movie
             {
                 Name = movieDTO.Name,
@@ -50,12 +48,15 @@ namespace test_SFF.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> ChangeAmount(int id, MovieDTO movieDTO)
         {
-            var movieOld = await _context.Movies.FindAsync(id);
-            if (movieOld == null)
+            var movieQuery = await _context.Movies.FindAsync(id);
+            if (movieQuery == null)
                 return NotFound();
 
-            movieOld.TotalAmount = movieDTO.TotalAmount;
-            // Måste man hantera vad som händer med filmer som redan är utlånade?
+            movieQuery.TotalAmount = movieDTO.TotalAmount;
+            // TOD: Måste man hantera vad som händer med filmer som redan är utlånade?
+                // T.ex. ifall man lånat ut totalt 10 och man sedan sätter TotalAmount till 6?
+                    // När filmerna sedan är returnerade kommer ..
+                        // Tror itne detta är ett problem.
             try
             {
                 await _context.SaveChangesAsync();
@@ -91,9 +92,17 @@ namespace test_SFF.Controllers
         [HttpPost]
         public async Task<ActionResult<MovieStudio>> PostMovieStudio(MovieStudio moviestudioDTO)
         {
-            // Kolla så att MovieStudio.AntalFilmer_i_moviestudioDTO.MovieId (SUM) är < Movie.TotalAmount med samma id som moviestudioDTO.MovieId.
-                // Måste göra en JOIN och returnera helst en bool.
-                // Måste kolla alla
+            // Kollar ifall det finns tillräckligt många kopior för att låna ut en film. Jämför antalet utlånade i MoviStudios med Movies.TotalAmount.
+            var fis2 = _context.MovieStudios.Where(x => x.MovieId == moviestudioDTO.MovieId).Count();
+            var fis5 = await _context.Movies.FindAsync(moviestudioDTO.MovieId);
+            if (fis2 >= fis5.TotalAmount)
+                return NotFound();
+
+            // Kollar så att inte MovieId och StudioId finns på samma rad i tabellen MovieStudios. För att motverka att samma studio lånar samma film.
+            bool fis6 = false;
+            fis6 = _context.MovieStudios.Any(x => x.MovieId == moviestudioDTO.MovieId && x.StudioId == moviestudioDTO.StudioId);
+            if (fis6 == true)
+                return NotFound();
 
             var moviestudio = new MovieStudio
             {
@@ -103,15 +112,8 @@ namespace test_SFF.Controllers
                 Returned = false
             };
 
-            //_context.MovieStudios.
-            // TODO: Måste kolla ifall det finns några filmer att låna ut; Movie.TotalAmount måste vara > 0 med alla inräknade i MovieStudios.
-                // Movie med Id == MovieId måste ha TotalAmount > 0.
-                // Vi måste joina MovieStudio ifall och räkna ihop alla MovieId (som är samma som MovieId).
-            // TODO: Måste också kolla ifall filmen redan är utlånad till samma studio.
-                // Kolla MovieStudio efter StudioId och MovieId på samma rad. Om det är sant så läggs ingen ny till.
             // TODO: Man ska kunna låna samma film en gång till ifall den är Returned = True; Sätter bara Returned till false igen.
             // TODO: Hårdkoda ett ReturnDate; ta dagens datum + 7 dagar?
-            
             
             if (!MovieExists(moviestudio.MovieId) || !StudioExists(moviestudio.StudioId))
                 return NotFound();
@@ -124,9 +126,52 @@ namespace test_SFF.Controllers
                     // Spännande notis är att här fungerar iaf "id" (returnerar rätt id).
             }
         }
+
+        // PUT: api/Movies/5/5
+//      [HttpPut("{movieid:int}/{studioid:int}")]
+        //[Route("MS")]       // POST: /api/Movies/MS/5
+        
+//      public async Task<IActionResult> ReturnMovie(int movieid, int studioid)
+//        [Route("MS3")]
+        [HttpPut("MS3/{id:int}")]
+        public async Task<IActionResult> ReturnMovie(int id)
+        {
+            //var movieBefore = await _context.Movies.FindAsync(id);
+            //var query = _context.MovieStudios.Where<MovieStudio>(x => x.MovieId == movieid && x.StudioId == studioid).First();
+            var query = await _context.MovieStudios.FindAsync(id);
+            if (query == null)
+                return NotFound();
+            //if (movieBefore == null)
+            //    return NotFound();
+
+            query.Returned = true;
+            //movieBefore.TotalAmount = movieDTO.TotalAmount;
+            // TOD: Måste man hantera vad som händer med filmer som redan är utlånade?
+                // T.ex. ifall man lånat ut totalt 10 och man sedan sätter TotalAmount till 6?
+                    // När filmerna sedan är returnerade kommer ..
+                        // Tror itne detta är ett problem.
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!MovieExists(1))      // TODO: Denna gör inget vettigs; vi borde kolla MovieStudio.
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
         // TODO: Måste finnas snyggare lösning än detta (route):
         // TODO: Alternativt så ta bara det id som båda (movieid och studioid) använder?
-        [HttpDelete("{movieid:int}/{studioid:int}")]   // DELETE: /api/Movies/2/1
+/*        [HttpDelete("{movieid:int}/{studioid:int}")]   // DELETE: /api/Movies/2/1
         public async Task<IActionResult> ReturnMovie([FromRoute] int movieid, [FromRoute] int studioid)
         {
             // TODO: Problem med denna implementation: eftersom att man tar bort raden med lånad film
@@ -138,18 +183,18 @@ namespace test_SFF.Controllers
             if (query == null)
             {
                 return NotFound();
-            }
+            } */
             // TODO: Byt ut denna mot en where direkt..
 /*            var moviestudioquery =
                 (from ms in moviestudiofromdb
                 where ms.MovieId == movieid && ms.StudioId == studioid
                 select ms).First(); */
             
-            _context.MovieStudios.Remove(query);
+/*            _context.MovieStudios.Remove(query);
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
+        } */
 
         // TODO: Inte snyggaste/mest consistent URL. Fixa på något sätt..
 //        [HttpPut("{movieid:int}/{studioid:int}")]   // PUT: /api/Movies/2/1
