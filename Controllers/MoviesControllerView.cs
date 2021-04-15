@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using test_SFF;
 using test_SFF.Data;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace test_SFF.Controllers
 {
+    [Authorize]
     public class MoviesControllerView : Controller
     {
         private readonly ApplicationDbContext _context;

@@ -33,7 +33,27 @@ namespace test_SFF.Controllers
         [AllowAnonymous]                // Gör så att man kan komma åt sidan utan inlogg.
         public IActionResult Index()
         {
-            return View(_context.Movies.ToList());
+            // TODO: Lägg till funktionalitet för att returnera även en lista med objekt över vilka filmer som är tillgängliga (för bilder).
+                // Måste kolla Movies-listan
+            List<string> movieCoverImagesStatus = new List<string>();
+            string filepath;
+            var moviesQuery = _context.Movies.ToList();
+
+            foreach(var i in moviesQuery)
+            {
+                filepath = @"wwwroot\images\" + i.Name + ".png";
+                if (System.IO.File.Exists(filepath))
+                    movieCoverImagesStatus.Add(i.Name);
+                else
+                    movieCoverImagesStatus.Add("NonExistent");
+            }
+            ViewData["availableImages"] = movieCoverImagesStatus;
+            // Kolla File.IO
+            // Kolla ifall filen existerar
+            // Spara i ny List
+
+              return View(moviesQuery);  
+        //    return View(_context.Movies.ToList());
         }
 
 /*      [AllowAnonymous]                // Gör så att man kan komma åt sidan utan inlogg.

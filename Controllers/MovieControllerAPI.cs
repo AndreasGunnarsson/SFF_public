@@ -93,25 +93,25 @@ namespace test_SFF.Controllers
         public async Task<ActionResult<MovieStudio>> PostMovieStudio(MovieStudio moviestudioDTO)
         {
             // Kollar ifall det finns tillräckligt många kopior för att låna ut en film. Jämför antalet utlånade i MoviStudios med Movies.TotalAmount.
-            var fis2 = _context.MovieStudios.Where(x => x.MovieId == moviestudioDTO.MovieId).Count();
-            var fis5 = await _context.Movies.FindAsync(moviestudioDTO.MovieId);
-            if (fis2 >= fis5.TotalAmount)
+            int movieStudioQuery = _context.MovieStudios.Where(x => x.MovieId == moviestudioDTO.MovieId).Count();
+            Movie movieQuery = await _context.Movies.FindAsync(moviestudioDTO.MovieId);
+            if (movieStudioQuery >= movieQuery.TotalAmount)
                 return NotFound();
 
             // Kollar så att inte MovieId och StudioId finns på samma rad i tabellen MovieStudios. För att motverka att samma studio lånar samma film.
-            bool fis6 = false;
-            fis6 = _context.MovieStudios.Any(x => x.MovieId == moviestudioDTO.MovieId && x.StudioId == moviestudioDTO.StudioId);
-            if (fis6 == true)
+            bool isNotDuplicates = false;
+            isNotDuplicates = _context.MovieStudios.Any(x => x.MovieId == moviestudioDTO.MovieId && x.StudioId == moviestudioDTO.StudioId);
+            if (isNotDuplicates == true)
                 return NotFound();
 
-            var moviestudio = new MovieStudio
+            MovieStudio moviestudio = new MovieStudio
             {
                 MovieId = moviestudioDTO.MovieId,
                 StudioId = moviestudioDTO.StudioId,
                 ReturnDate = moviestudioDTO.ReturnDate,
                 Returned = false
             };
-
+            // TODO: Väldigt viktigt att kolla att Id på Movie och Studio existerar annars kommer databasen klaga på fel FK.
             // TODO: Man ska kunna låna samma film en gång till ifall den är Returned = True; Sätter bara Returned till false igen.
             // TODO: Hårdkoda ett ReturnDate; ta dagens datum + 7 dagar?
             
@@ -119,11 +119,12 @@ namespace test_SFF.Controllers
                 return NotFound();
             else
             {
-                _context.MovieStudios.Add(moviestudioDTO);
+                _context.MovieStudios.Add(moviestudio);
                 await _context.SaveChangesAsync();
                 return CreatedAtAction("GetMovieStudio", new { id = moviestudioDTO.Id }, moviestudioDTO);
                 // TODO: Denna returnerar inte DTO! Tror att det har att göra med att "GetMovieStudio" är en actionmetod som måste existera.
                     // Spännande notis är att här fungerar iaf "id" (returnerar rätt id).
+                    // Lösning: Har något att göra med Add()?
             }
         }
 

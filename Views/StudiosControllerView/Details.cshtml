@@ -1,30 +1,70 @@
-@model test_SFF.Studio
+@using System.Collections.Generic
+@model MovieStudioDetails
 
 @{
     ViewData["Title"] = "Details";
 }
 
 <h1>Details</h1>
-
 <div>
     <h4>Studio</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.Studio.Name)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
+            @Html.DisplayFor(model => model.Studio.Name)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Location)
+            @Html.DisplayNameFor(model => model.Studio.Location)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Location)
+            @Html.DisplayFor(model => model.Studio.Location)
         </dd>
     </dl>
 </div>
+<h2>Borrowed movies:</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Movie.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Movie.PhysicalCopy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Movie.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Movie.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.JoinedList) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PhysicalCopy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReturnDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Returned)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model.Studio.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using test_SFF;
+using System.Web;
 using test_SFF.Data;
 
 namespace test_SFF.Controllers
@@ -22,6 +23,13 @@ namespace test_SFF.Controllers
         // GET: StudiosControllerView
         public async Task<IActionResult> Index()
         {
+            //ViewData["bob"] = "Fiskorv";
+            /* ViewData["FIS1"]  = new Movie
+            {
+                Name = "Steve",
+                TotalAmount = 30,
+                PhysicalCopy = false
+            }; */
             return View(await _context.Studios.ToListAsync());
         }
 
@@ -32,6 +40,11 @@ namespace test_SFF.Controllers
             {
                 return NotFound();
             }
+            var moviestudio = _context.MovieStudios.Where<MovieStudio>(m => m.StudioId == id).ToList();
+/*          if (moviestudio == null)
+            {
+                return NotFound();
+            }*/
 
             var studio = await _context.Studios
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -39,8 +52,27 @@ namespace test_SFF.Controllers
             {
                 return NotFound();
             }
+            
+            var moviesQuery = await _context.Movies.ToListAsync();
 
-            return View(studio);
+            var JoinedTables = (from ms in moviestudio
+                join movie in moviesQuery on ms.MovieId equals movie.Id
+                select new MovieName { Name = movie.Name, PhysicalCopy = movie.PhysicalCopy, ReturnDate = ms.ReturnDate, Returned = ms.Returned}).ToList();
+            /*var JOINMOVIESTUDIOO = _context.MovieStudios.Join(
+                JoinMovieStudio,
+                studio => studio.MovieId,
+                movie => movie.Id,
+                (studio, movie) => new
+                    {
+                        MovieName = movie.Name
+                    }
+            ).ToList(); */
+            // TODO: Vi behöver också JOIN:a för att få med vad Movie.Name är till ett specifikt Id.
+            MovieStudioDetails collectionObject = new MovieStudioDetails {Studio = studio, MovieStudioList = moviestudio, JoinedList = JoinedTables};
+
+            ViewData["MovieStudio"] = moviestudio;
+            //return View(studio);
+            return View(collectionObject);
         }
 
         // GET: StudiosControllerView/Create

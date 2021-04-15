@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Home Page";
+    var images = ViewData["availableImages"] as List<string>;
+    int i = -1;
 }
 
 <div class="text-center">
@@ -26,6 +28,7 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
+        i++;
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
@@ -37,7 +40,7 @@
                 @Html.DisplayFor(modelItem => item.PhysicalCopy)
             </td>
             <td>
-                <img src="~/images/@(item.Name.ToString()).png" class="img" alt="My image" height="200"/>
+                <img src="~/images/@(images[i]).png" class="img" alt="My image" height="200"/>
             </td>
         </tr>
 }
