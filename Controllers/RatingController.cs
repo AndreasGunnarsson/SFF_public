@@ -10,7 +10,7 @@ using test_SFF.Data;
 
 namespace test_SFF.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Ratings")]
     [ApiController]
     public class RatingController : ControllerBase
     {
@@ -21,7 +21,24 @@ namespace test_SFF.Controllers
             _context = context;
         }
 
-        // GET: api/Rating
+
+
+        // POST: api/Ratings
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<Rating>> PostRating(Rating rating)
+        {
+            // Ska bara gå att skapa ifall filmen är MovieStudio.Returned = true.
+            // Ska bara gå att recensera samma film från samma studio en gång.
+            _context.Ratings.Add(rating);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetRating", new { id = rating.Id }, rating);
+        }
+
+
+// -------------------------------------------------------
+        // GET: api/Ratings
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Rating>>> GetRatings()
         {
@@ -71,17 +88,6 @@ namespace test_SFF.Controllers
             }
 
             return NoContent();
-        }
-
-        // POST: api/Rating
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Rating>> PostRating(Rating rating)
-        {
-            _context.Ratings.Add(rating);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetRating", new { id = rating.Id }, rating);
         }
 
         // DELETE: api/Rating/5

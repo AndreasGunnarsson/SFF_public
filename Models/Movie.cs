@@ -19,7 +19,19 @@ namespace test_SFF
         public List<Rating> Ratings { get; set; }
     }
 
-        public class MovieDTO
+    public class MovieAvailableAmount
+    {
+        public int Id { get; set; }
+        [StringLength(10)]
+        public string Name { get; set; }
+//      public DateTime Year { get; set; }
+        [Range(0, 999)]
+        public int TotalAmount { get; set; }
+        public bool PhysicalCopy { get; set; }
+        public int BorrowedAmount { get; set; }
+    }
+
+    public class MovieDTO
     {
         public int Id { get; set; }
         [StringLength(10)]

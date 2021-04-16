@@ -40,38 +40,27 @@ namespace test_SFF.Controllers
             {
                 return NotFound();
             }
-            var moviestudio = _context.MovieStudios.Where<MovieStudio>(m => m.StudioId == id).ToList();
-/*          if (moviestudio == null)
-            {
-                return NotFound();
-            }*/
 
-            var studio = await _context.Studios
-                .FirstOrDefaultAsync(m => m.Id == id);
+            // Hämtar lista med alla filmer lånade filmer som har ett specifikt StudioId.
+            var movieStudioQuery = _context.MovieStudios.Where<MovieStudio>(m => m.StudioId == id).ToList();
+
+            // Hämtar den studio som efterfrågas i URL:en.
+            Studio studio = await _context.Studios.FirstOrDefaultAsync(m => m.Id == id);
             if (studio == null)
             {
                 return NotFound();
             }
             
+            // Hämtar alla filmer.
             var moviesQuery = await _context.Movies.ToListAsync();
 
-            var JoinedTables = (from ms in moviestudio
+            // Joinar de filmer som finns i moviestudio med movieQuery så att man kan få ut namnen på dem.
+            var joinedTables = (from ms in movieStudioQuery
                 join movie in moviesQuery on ms.MovieId equals movie.Id
                 select new MovieName { Name = movie.Name, PhysicalCopy = movie.PhysicalCopy, ReturnDate = ms.ReturnDate, Returned = ms.Returned}).ToList();
-            /*var JOINMOVIESTUDIOO = _context.MovieStudios.Join(
-                JoinMovieStudio,
-                studio => studio.MovieId,
-                movie => movie.Id,
-                (studio, movie) => new
-                    {
-                        MovieName = movie.Name
-                    }
-            ).ToList(); */
-            // TODO: Vi behöver också JOIN:a för att få med vad Movie.Name är till ett specifikt Id.
-            MovieStudioDetails collectionObject = new MovieStudioDetails {Studio = studio, MovieStudioList = moviestudio, JoinedList = JoinedTables};
 
-            ViewData["MovieStudio"] = moviestudio;
-            //return View(studio);
+            MovieStudioDetails collectionObject = new MovieStudioDetails {Studio = studio, JoinedList = joinedTables};
+            // TODO: Behöver ha Movie-objektet för att sätta namnet på "rätt sätt" i hemside-koden.
             return View(collectionObject);
         }
 

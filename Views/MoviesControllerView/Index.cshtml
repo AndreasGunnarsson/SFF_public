@@ -1,4 +1,4 @@
-@model IEnumerable<test_SFF.Movie>
+@model IEnumerable<test_SFF.MovieAvailableAmount>
 
 @{
     ViewData["Title"] = "Index";
@@ -19,6 +19,9 @@
                 @Html.DisplayNameFor(model => model.TotalAmount)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.BorrowedAmount)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.PhysicalCopy)
             </th>
             <th></th>
@@ -32,6 +35,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.TotalAmount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BorrowedAmount)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.PhysicalCopy)

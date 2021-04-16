@@ -35,7 +35,7 @@ namespace test_SFF
     {
         public Studio Studio { get; set; }
         public Movie Movie { get; set; }
-        public List<MovieStudio> MovieStudioList { get; set; }
+//      public List<MovieStudio> MovieStudioList { get; set; }
         public List<MovieName> JoinedList { get; set; }
     }
 }

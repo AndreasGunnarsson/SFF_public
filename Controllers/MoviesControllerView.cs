@@ -25,7 +25,26 @@ namespace test_SFF.Controllers
         // GET: MoviesControllerView
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Movies.ToListAsync());
+            var movieQuery = await _context.Movies.ToListAsync();
+
+            // Count på alla filmer:
+            var movieStudioQuery =
+                _context.MovieStudios
+                .GroupBy(x => x.MovieId)
+                .Select(y => new { MovieId = y.Key, BorrowedAmount = y.Count() })
+                .ToList();
+
+/*            var joinedTables = (from movie in movieQuery
+                join ms in movieStudioQuery on movie.Id equals ms.MovieId
+                select new MovieAvailableAmount { Id = movie.Id, Name = movie.Name, PhysicalCopy = movie.PhysicalCopy, TotalAmount = movie.TotalAmount, BorrowedAmount = ms.BorrowedAmount}).ToList();
+*/
+            var joinedTables = (from movie in movieQuery
+                join ms in movieStudioQuery on movie.Id equals ms.MovieId into newtable
+                from bajs2 in newtable.DefaultIfEmpty()
+                select new MovieAvailableAmount { Id = movie.Id, Name = movie.Name, PhysicalCopy = movie.PhysicalCopy, TotalAmount = movie.TotalAmount, BorrowedAmount = bajs2?.BorrowedAmount ?? 0}).ToList();
+
+//          return View(await _context.Movies.ToListAsync());         // Enda raden som finns by default!
+            return View(joinedTables);
         }
 
         // GET: MoviesControllerView/Details/5
@@ -59,6 +78,7 @@ namespace test_SFF.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,TotalAmount,PhysicalCopy")] Movie movie)
         {
+            // TODO: Måste kolla ifall namnet redan existerar och physicalcopy.
             if (ModelState.IsValid)
             {
                 _context.Add(movie);
@@ -71,6 +91,7 @@ namespace test_SFF.Controllers
         // GET: MoviesControllerView/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            // TODO: Måste kolla ifall namnet redan existerar och physicalcopy.
             if (id == null)
             {
                 return NotFound();

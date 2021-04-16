@@ -92,22 +92,44 @@ namespace test_SFF.Controllers
             return _context.Studios.Any(e => e.Id == id);
         }
 
-        // TODO: För att hämta vilka filmer en viss förening har lånat.
-        // GET: api/Studio/5
+        // GET: api/Studios/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Studio>> GetMovieStudio(int id)
+        public async Task<ActionResult<IEnumerable<MovieName>>> GetMovieStudio(int id)
         {
-            var studio = await _context.Studios.FindAsync(id);
+/*          if (id == null)
+            {
+                return NotFound();
+            } */
 
-            // Måste joina Movie, Studio med MovieStudio för att kunna skriva ut namn på allt.
-                // Skapa en ny list där allt sparas temporärt?
+            // Hämtar lista med alla filmer lånade filmer som har ett specifikt StudioId.
+            var movieStudioQuery = _context.MovieStudios.Where<MovieStudio>(m => m.StudioId == id).ToList();
+
+            // Hämtar den studio som efterfrågas i URL:en.
+/*            Studio studio = await _context.Studios.FirstOrDefaultAsync(m => m.Id == id);
             if (studio == null)
             {
                 return NotFound();
-            }
+            }*/
+            
+            // Hämtar alla filmer.
+            var moviesQuery = await _context.Movies.ToListAsync();
 
-            return studio;
+            // Joinar de filmer som finns i moviestudio med movieQuery så att man kan få ut namnen på dem.
+            var joinedTables = (from ms in movieStudioQuery
+                join movie in moviesQuery on ms.MovieId equals movie.Id
+                select new MovieName { Name = movie.Name, PhysicalCopy = movie.PhysicalCopy, ReturnDate = ms.ReturnDate, Returned = ms.Returned}).ToList();
+
+//            MovieStudioDetails collectionObject = new MovieStudioDetails {Studio = studio, JoinedList = joinedTables};
+
+            return joinedTables;
         }
+
+
+
+
+
+
+// ---------------------------------------
 
         // GET: api/NewStudio
         [HttpGet]
