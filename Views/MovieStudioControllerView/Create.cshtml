@@ -1,0 +1,58 @@
+@model test_SFF.MovieStudio
+
+@{
+    ViewData["Title"] = "Create";
+    var fis = ViewData["Movie"] as Movie;
+}
+
+<h1>Create</h1>
+
+<h4>MovieStudio</h4>
+<hr />
+
+<h2>Movie: @fis.Name</h2>
+<h2>Physical copy: @fis.PhysicalCopy</h2>
+@* @Html.DisplayNameFor(fis => fis.MovieId)
+@Html.DisplayFor(modelItem => fis.Name)
+@Html.DisplayNameFor(fis.PhysicalCopy)
+@Html.DisplayFor(modelItem => fis.PhysicalCopy) *@
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @* <div class="form-group">
+                <label asp-for="MovieId" class="control-label"></label>
+                <select asp-for="MovieId" class ="form-control" asp-items="ViewBag.MovieId"></select>
+            </div> *@
+            <div class="form-group">
+
+            </div>
+            <div class="form-group">
+                <label asp-for="StudioId" class="control-label"></label>
+                <select asp-for="StudioId" class ="form-control" asp-items="ViewBag.StudioId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReturnDate" class="control-label"></label>
+                <input asp-for="ReturnDate" class="form-control" />
+                <span asp-validation-for="ReturnDate" class="text-danger"></span>
+            </div>
+            @* <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Returned" /> @Html.DisplayNameFor(model => model.Returned)
+                </label>
+            </div> *@
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" asp-route-id="@fis.Id" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-controller="MoviesControllerView" asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

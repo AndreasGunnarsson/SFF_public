@@ -30,7 +30,7 @@ namespace test_SFF.Controllers
             _context = context;
         }
 
-        [AllowAnonymous]                // Gör så att man kan komma åt sidan utan inlogg.
+//        [AllowAnonymous]                // Gör så att man kan komma åt sidan utan inlogg.
         public IActionResult Index()
         {
             // TODO: Lägg till funktionalitet för att returnera även en lista med objekt över vilka filmer som är tillgängliga (för bilder).
@@ -62,11 +62,11 @@ namespace test_SFF.Controllers
             return View();
         } */
 
-        [AllowAnonymous]                // Gör så att man kan komma åt sidan utan inlogg.
+/*        [AllowAnonymous]                // Gör så att man kan komma åt sidan utan inlogg.
         public IActionResult Privacy()
         {
             return View();
-        }
+        } */
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

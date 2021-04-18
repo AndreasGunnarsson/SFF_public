@@ -57,9 +57,9 @@ namespace test_SFF.Controllers
             // Joinar de filmer som finns i moviestudio med movieQuery så att man kan få ut namnen på dem.
             var joinedTables = (from ms in movieStudioQuery
                 join movie in moviesQuery on ms.MovieId equals movie.Id
-                select new MovieName { Name = movie.Name, PhysicalCopy = movie.PhysicalCopy, ReturnDate = ms.ReturnDate, Returned = ms.Returned}).ToList();
+                select new MovieName { MovieStudioId = ms.Id, Name = movie.Name, PhysicalCopy = movie.PhysicalCopy, ReturnDate = ms.ReturnDate, Returned = ms.Returned }).ToList();
 
-            MovieStudioDetails collectionObject = new MovieStudioDetails {Studio = studio, JoinedList = joinedTables};
+            MovieStudioDetails collectionObject = new MovieStudioDetails { Studio = studio, JoinedList = joinedTables };
             // TODO: Behöver ha Movie-objektet för att sätta namnet på "rätt sätt" i hemside-koden.
             return View(collectionObject);
         }

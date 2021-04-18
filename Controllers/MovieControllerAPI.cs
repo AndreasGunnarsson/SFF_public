@@ -104,6 +104,9 @@ namespace test_SFF.Controllers
             if (isNotDuplicates == true)
                 return NotFound();
 
+            if (moviestudioDTO.ReturnDate <= DateTime.Now)
+                return NotFound();
+
             MovieStudio moviestudio = new MovieStudio
             {
                 MovieId = moviestudioDTO.MovieId,
@@ -319,7 +322,7 @@ namespace test_SFF.Controllers
             return NoContent();
         }
 
-                // GET: api/NewMovie
+        // GET: api/NewMovie
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Movie>>> GetMovies()
         {
