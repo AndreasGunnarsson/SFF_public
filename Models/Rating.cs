@@ -1,4 +1,4 @@
-namespace test_SFF
+/*namespace test_SFF
 {
     public class Rating
     {
@@ -10,4 +10,4 @@ namespace test_SFF
         public string Review { get; set; }
         public int Score { get; set; }
     }
-}
+}*/

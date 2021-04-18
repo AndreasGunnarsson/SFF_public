@@ -248,6 +248,12 @@ namespace test_SFF.Migrations
                     b.Property<bool>("Returned")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Review")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("StudioId")
                         .HasColumnType("INTEGER");
 
@@ -284,7 +290,7 @@ namespace test_SFF.Migrations
 
                     b.HasIndex("StudioId");
 
-                    b.ToTable("Ratings");
+                    b.ToTable("Rating");
                 });
 
             modelBuilder.Entity("test_SFF.Studio", b =>

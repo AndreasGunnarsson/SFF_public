@@ -21,7 +21,7 @@ namespace test_SFF.Controllers
             _context = context;
         }
 
-        // POST: api/Studios
+        // POST: /api/Studios
         [HttpPost]
         public async Task<ActionResult<StudioDTO>> PostStudio(StudioDTO studioDTO)
         {
@@ -42,7 +42,7 @@ namespace test_SFF.Controllers
             return CreatedAtAction("GetStudio", new { id = studio.Id }, studioDTO);
         }
 
-        // DELETE: api/Studios/5
+        // DELETE: /api/Studios/#
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStudio(int id)
         {
@@ -56,7 +56,7 @@ namespace test_SFF.Controllers
             return NoContent();
         }
 
-        // PUT: api/Studios/5
+        // PUT: /api/Studios/#
         [HttpPut("{id}")]
         public async Task<IActionResult> PutStudio(int id, StudioDTO studioDTO)
         {
@@ -68,10 +68,14 @@ namespace test_SFF.Controllers
             studioBefore.Name = studioDTO.Name;
             studioBefore.Location = studioDTO.Location;
 
-            try
+//          try
+//          {
+            if (!StudioExists(id))
             {
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
+            await _context.SaveChangesAsync();
+/*          }
             catch (DbUpdateConcurrencyException)
             {
                 if (!StudioExists(id))
@@ -82,7 +86,62 @@ namespace test_SFF.Controllers
                 {
                     throw;
                 }
-            }
+            } */
+
+            return NoContent();
+        }
+
+        // GET: /api/Studios/#
+        [HttpGet("{id}")]
+        public async Task<ActionResult<IEnumerable<MovieName>>> GetMovieStudio(int id)
+        {
+            // Hämtar lista med alla filmer lånade filmer som har ett specifikt StudioId.
+            var movieStudioQuery = _context.MovieStudios.Where<MovieStudio>(m => m.StudioId == id).ToList();
+            if (movieStudioQuery.Count() == 0)
+                return NotFound();
+            
+            // Hämtar alla filmer.
+            var moviesQuery = await _context.Movies.ToListAsync();
+            if (movieStudioQuery.Count() == 0)
+                return NotFound();
+
+            // Joinar de filmer som finns i movieStudioQuery med movieQuery så att man kan få ut namnen på dem.
+            var joinedTables = (from ms in movieStudioQuery
+                join movie in moviesQuery on ms.MovieId equals movie.Id
+                select new MovieName { Name = movie.Name, PhysicalCopy = movie.PhysicalCopy, ReturnDate = ms.ReturnDate, Returned = ms.Returned}).ToList();
+
+            return joinedTables;
+        }
+
+        // PUT: /api/Studios/MS/#
+        [HttpPut("MS/{id:int}")]
+        public async Task<IActionResult> PutRating(int id, MovieStudioRating movieStudioRating)
+        {
+            var movieStudioQuery = await _context.MovieStudios.FindAsync(id);
+            if (movieStudioQuery == null)
+                return NotFound();
+            
+            if (movieStudioQuery.Returned == false)
+                return NotFound();
+
+            movieStudioQuery.Score = movieStudioRating.Score;
+            movieStudioQuery.Review = movieStudioRating.Review;
+
+//            try
+//            {
+            await _context.SaveChangesAsync();
+/*            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!StudioExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            } */
 
             return NoContent();
         }
@@ -91,43 +150,6 @@ namespace test_SFF.Controllers
         {
             return _context.Studios.Any(e => e.Id == id);
         }
-
-        // GET: api/Studios/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<MovieName>>> GetMovieStudio(int id)
-        {
-/*          if (id == null)
-            {
-                return NotFound();
-            } */
-
-            // Hämtar lista med alla filmer lånade filmer som har ett specifikt StudioId.
-            var movieStudioQuery = _context.MovieStudios.Where<MovieStudio>(m => m.StudioId == id).ToList();
-
-            // Hämtar den studio som efterfrågas i URL:en.
-/*            Studio studio = await _context.Studios.FirstOrDefaultAsync(m => m.Id == id);
-            if (studio == null)
-            {
-                return NotFound();
-            }*/
-            
-            // Hämtar alla filmer.
-            var moviesQuery = await _context.Movies.ToListAsync();
-
-            // Joinar de filmer som finns i moviestudio med movieQuery så att man kan få ut namnen på dem.
-            var joinedTables = (from ms in movieStudioQuery
-                join movie in moviesQuery on ms.MovieId equals movie.Id
-                select new MovieName { Name = movie.Name, PhysicalCopy = movie.PhysicalCopy, ReturnDate = ms.ReturnDate, Returned = ms.Returned}).ToList();
-
-//            MovieStudioDetails collectionObject = new MovieStudioDetails {Studio = studio, JoinedList = joinedTables};
-
-            return joinedTables;
-        }
-
-
-
-
-
 
 // ---------------------------------------
 

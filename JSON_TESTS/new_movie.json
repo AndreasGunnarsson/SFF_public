@@ -1,7 +1,5 @@
 {
 	"name":"John3",
-	"age":31,
-	"totalamount":10,
-	"city":"New York",
-	"PhysicalCopy":true
+	"totalamount":3,
+	"PhysicalCopy":false
 }

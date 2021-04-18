@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace test_SFF
 {
@@ -12,6 +13,8 @@ namespace test_SFF
         public Studio Studio { get; set; }
         public DateTime ReturnDate { get; set; }
         public bool Returned { get; set; }
+        public string Review { get; set; }
+        public int Score { get; set; }
     }
 
     public class MovieStudioDTO
@@ -21,6 +24,16 @@ namespace test_SFF
         public int StudioId { get; set; }
         public DateTime ReturnDate { get; set; }
         public bool Returned { get; set; }
+    }
+
+    public class MovieStudioRating
+    {
+        [Required]
+        [StringLength(30)]
+        public string Review { get; set; }
+        [Required]
+        [Range(0, 5)]
+        public int Score { get; set; }
     }
 
     public class MovieName

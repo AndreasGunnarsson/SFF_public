@@ -16,7 +16,7 @@ namespace test_SFF
         public bool PhysicalCopy { get; set; }
         public List<MovieStudio> MovieStudios { get; set; }
 //        public bool DigitalPhysical { get; set; }
-        public List<Rating> Ratings { get; set; }
+//        public List<Rating> Ratings { get; set; }
     }
 
     public class MovieAvailableAmount
@@ -26,14 +26,17 @@ namespace test_SFF
         public string Name { get; set; }
 //      public DateTime Year { get; set; }
         [Range(0, 999)]
+        [Display(Name = "Total Amount")]
         public int TotalAmount { get; set; }
+        [Display(Name = "Physical Copy")]
         public bool PhysicalCopy { get; set; }
+        [Display(Name = "Borrowed Amount")]
         public int BorrowedAmount { get; set; }
     }
 
     public class MovieDTO
     {
-        public int Id { get; set; }
+//      public int Id { get; set; }         // TODO: Fyller ingen funktion?
         [StringLength(10)]
         public string Name { get; set; }
 //      public DateTime Year { get; set; }
