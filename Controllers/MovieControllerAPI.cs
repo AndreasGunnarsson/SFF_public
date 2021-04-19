@@ -78,8 +78,8 @@ namespace test_SFF.Controllers
         }
 
         // TODO: Ful route:
-        // POST: /api/Movies/MS
-        [Route("MS")]
+        // POST: /api/Movies/Borrow
+        [Route("Borrow")]
         [HttpPost]
         public async Task<ActionResult<MovieStudioDTO>> PostMovieBorrow(MovieStudioDTO movieStudioDTO)
         {
@@ -104,7 +104,8 @@ namespace test_SFF.Controllers
                 MovieId = movieStudioDTO.MovieId,
                 StudioId = movieStudioDTO.StudioId,
                 ReturnDate = movieStudioDTO.ReturnDate,
-                Returned = false
+                Returned = false,
+                Score = 0
             };
             
             if (!MovieExists(movieStudio.MovieId) || !StudioExists(movieStudio.StudioId))
@@ -117,8 +118,8 @@ namespace test_SFF.Controllers
             }
         }
 
-        // PUT: /api/Movies/MS2/#
-        [HttpPut("MS2/{id:int}")]
+        // PUT: /api/Movies/Return/#
+        [HttpPut("Return/{id:int}")]
         public async Task<IActionResult> PutReturnMovie(int id)
         {
             MovieStudio movieStudioQuery = await _context.MovieStudios.FindAsync(id);

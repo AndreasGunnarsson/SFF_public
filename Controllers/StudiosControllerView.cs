@@ -23,13 +23,6 @@ namespace test_SFF.Controllers
         // GET: StudiosControllerView
         public async Task<IActionResult> Index()
         {
-            //ViewData["bob"] = "Fiskorv";
-            /* ViewData["FIS1"]  = new Movie
-            {
-                Name = "Steve",
-                TotalAmount = 30,
-                PhysicalCopy = false
-            }; */
             return View(await _context.Studios.ToListAsync());
         }
 
@@ -71,8 +64,6 @@ namespace test_SFF.Controllers
         }
 
         // POST: StudiosControllerView/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Location")] Studio studio)
@@ -81,57 +72,6 @@ namespace test_SFF.Controllers
             {
                 _context.Add(studio);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(studio);
-        }
-
-        // GET: StudiosControllerView/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var studio = await _context.Studios.FindAsync(id);
-            if (studio == null)
-            {
-                return NotFound();
-            }
-            return View(studio);
-        }
-
-        // POST: StudiosControllerView/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Location")] Studio studio)
-        {
-            if (id != studio.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(studio);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!StudioExists(studio.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
                 return RedirectToAction(nameof(Index));
             }
             return View(studio);
@@ -170,5 +110,55 @@ namespace test_SFF.Controllers
         {
             return _context.Studios.Any(e => e.Id == id);
         }
+
+// --------------------------------------------------------------- Används ej:
+        // GET: StudiosControllerView/Edit/5
+/*        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var studio = await _context.Studios.FindAsync(id);
+            if (studio == null)
+            {
+                return NotFound();
+            }
+            return View(studio);
+        }
+
+        // POST: StudiosControllerView/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Location")] Studio studio)
+        {
+            if (id != studio.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(studio);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!StudioExists(studio.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(studio);
+        } */
     }
 }

@@ -113,8 +113,8 @@ namespace test_SFF.Controllers
             return joinedTables;
         }
 
-        // PUT: /api/Studios/MS/#
-        [HttpPut("MS/{id:int}")]
+        // PUT: /api/Studios/Rating/#
+        [HttpPut("Rating/{id:int}")]
         public async Task<IActionResult> PutRating(int id, MovieStudioRating movieStudioRating)
         {
             var movieStudioQuery = await _context.MovieStudios.FindAsync(id);

@@ -30,11 +30,8 @@ namespace test_SFF.Controllers
             _context = context;
         }
 
-//        [AllowAnonymous]                // Gör så att man kan komma åt sidan utan inlogg.
         public IActionResult Index()
         {
-            // TODO: Lägg till funktionalitet för att returnera även en lista med objekt över vilka filmer som är tillgängliga (för bilder).
-                // Måste kolla Movies-listan
             List<string> movieCoverImagesStatus = new List<string>();
             string filepath;
             var moviesQuery = _context.Movies.ToList();
@@ -49,7 +46,7 @@ namespace test_SFF.Controllers
             }
             ViewData["availableImages"] = movieCoverImagesStatus;
 
-            var movieStudioQuery = _context.MovieStudios.ToList();
+            List<MovieStudio> movieStudioQuery = _context.MovieStudios.Where(x => x.Score > 0).ToList();
 
             var movieAverageScore = from ms in movieStudioQuery
                 group ms by ms.MovieId into newtable
@@ -64,32 +61,17 @@ namespace test_SFF.Controllers
                 select new MovieWithRating { Id = movie.Id, Name = movie.Name, TotalAmount = movie.TotalAmount, PhysicalCopy = movie.PhysicalCopy, AverageScore = ma.AverageScore}).ToList();
 
             return View(joinedTables);
-//            return View(moviesQuery);
-        //    return View(_context.Movies.ToList());
         }
 
         public IActionResult Review(int id)
         {
-            // TODO: Ska endast returnera för en specifik movieid
             return View(_context.MovieStudios.Where(x => x.MovieId == id));
         }
 
-/*      [AllowAnonymous]                // Gör så att man kan komma åt sidan utan inlogg.
-        public IActionResult Index()
-        {
-            return View();
-        } */
-
-/*        [AllowAnonymous]                // Gör så att man kan komma åt sidan utan inlogg.
-        public IActionResult Privacy()
-        {
-            return View();
-        } */
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+/*        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        }*/
     }
 }

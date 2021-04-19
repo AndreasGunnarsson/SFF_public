@@ -16,7 +16,5 @@ namespace test_SFF.Data
         public DbSet<Movie> Movies { get; set; }
         public DbSet<Studio> Studios { get; set; }
         public DbSet<MovieStudio> MovieStudios { get; set; }
-        // public DbSet<Rating> Ratings { get; set; }
-        
     }
 }

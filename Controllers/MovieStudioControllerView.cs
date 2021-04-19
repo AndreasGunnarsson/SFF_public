@@ -19,50 +19,15 @@ namespace test_SFF.Controllers
             _context = context;
         }
 
-        // GET: MovieStudioControllerView
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Create(int id)
         {
-            var applicationDbContext = _context.MovieStudios.Include(m => m.Movie).Include(m => m.Studio);
-            return View(await applicationDbContext.ToListAsync());
-        }
-
-        // GET: MovieStudioControllerView/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var movieStudio = await _context.MovieStudios
-                .Include(m => m.Movie)
-                .Include(m => m.Studio)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (movieStudio == null)
-            {
-                return NotFound();
-            }
-
-            return View(movieStudio);
-        }
-
-        public async Task<IActionResult> Create(int id)           // När man klickar på "Create New" i index kommer man hit.
-        {
-            // TODO: Returned ska inte gå att kryssa i här; görs i bakgrunden.
-            // TODO: Hade varit snyggt om man kunde skriva in datum på ett snyggare sätt.
-                // Man ska kunna skriva in ett datum som filmen måste vara inlämnad på. Måste vara efter dagens datum.
-            //ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Name");
-            // TODO: Om man vill ha en snyggare lista (t.ex. för att visa physical och inte samt filmer som inte går att låna) måste man nog göra en egen list med "SelectListItem".
-                // Tror också att man hade kunnat fixa till det snyggare med (int? id)
-//            ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Id", new {MovieId = id});      // Name i sista istället för Id.
-
             Movie movieQuery = await _context.Movies.FindAsync(id);
 
             if(movieQuery == null)
                 return NotFound();          // TODO: Snyggare felmeddelande
 
             ViewData["Movie"] = movieQuery;
-            ViewData["StudioId"] = new SelectList(_context.Studios, "Id", "Id");        // TODO: Name i sista istället för Id.
+            ViewData["StudioId"] = new SelectList(_context.Studios, "Id", "Name");
             return View();
         }
 
@@ -169,26 +134,7 @@ namespace test_SFF.Controllers
             return View();
         }
 
-        // GET: MovieStudioControllerView/Edit/5
-/*        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var movieStudio = await _context.MovieStudios.FindAsync(id);
-            if (movieStudio == null)
-            {
-                return NotFound();
-            }
-            ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Id", movieStudio.MovieId);
-            ViewData["StudioId"] = new SelectList(_context.Studios, "Id", "Id", movieStudio.StudioId);
-            return View(movieStudio);
-        } */
-
         // POST: MovieStudioControllerView/Edit/5
-        // TODO: Fuling: Använder inte checkboxen på hemsidan till något utna vi sätter returned till true hur man än gör.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit([Bind("Id")] MovieStudio movieStudio)
@@ -223,6 +169,33 @@ namespace test_SFF.Controllers
 
 
 // ------------------------------------------------------ Not needed:
+
+        // GET: MovieStudioControllerView
+        public async Task<IActionResult> Index()
+        {
+            var applicationDbContext = _context.MovieStudios.Include(m => m.Movie).Include(m => m.Studio);
+            return View(await applicationDbContext.ToListAsync());
+        }
+
+        // GET: MovieStudioControllerView/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var movieStudio = await _context.MovieStudios
+                .Include(m => m.Movie)
+                .Include(m => m.Studio)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (movieStudio == null)
+            {
+                return NotFound();
+            }
+
+            return View(movieStudio);
+        }
 
         // GET: MovieStudioControllerView/Delete/5
         public async Task<IActionResult> Delete(int? id)

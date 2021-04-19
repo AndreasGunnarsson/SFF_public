@@ -32,7 +32,7 @@ namespace test_SFF
         [StringLength(30)]
         public string Review { get; set; }
         [Required]
-        [Range(0, 5)]
+        [Range(1, 5)]
         public int Score { get; set; }
     }
 

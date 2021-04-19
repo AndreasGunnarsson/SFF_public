@@ -9,7 +9,6 @@ using test_SFF;
 using test_SFF.Data;
 using Microsoft.AspNetCore.Authorization;
 
-
 namespace test_SFF.Controllers
 {
     [Authorize]
@@ -22,7 +21,7 @@ namespace test_SFF.Controllers
             _context = context;
         }
 
-        // GET: MoviesControllerView
+        // GET: /MoviesControllerView
         public async Task<IActionResult> Index()
         {
             var movieQuery = await _context.Movies.ToListAsync();
@@ -34,20 +33,15 @@ namespace test_SFF.Controllers
                 .Select(y => new { MovieId = y.Key, BorrowedAmount = y.Count() })
                 .ToList();
 
-/*            var joinedTables = (from movie in movieQuery
-                join ms in movieStudioQuery on movie.Id equals ms.MovieId
-                select new MovieAvailableAmount { Id = movie.Id, Name = movie.Name, PhysicalCopy = movie.PhysicalCopy, TotalAmount = movie.TotalAmount, BorrowedAmount = ms.BorrowedAmount}).ToList();
-*/
             var joinedTables = (from movie in movieQuery
                 join ms in movieStudioQuery on movie.Id equals ms.MovieId into newtable
-                from bajs2 in newtable.DefaultIfEmpty()
-                select new MovieAvailableAmount { Id = movie.Id, Name = movie.Name, PhysicalCopy = movie.PhysicalCopy, TotalAmount = movie.TotalAmount, BorrowedAmount = bajs2?.BorrowedAmount ?? 0}).ToList();
+                from variablename in newtable.DefaultIfEmpty()
+                select new MovieAvailableAmount { Id = movie.Id, Name = movie.Name, PhysicalCopy = movie.PhysicalCopy, TotalAmount = movie.TotalAmount, BorrowedAmount = variablename?.BorrowedAmount ?? 0}).ToList();
 
-//          return View(await _context.Movies.ToListAsync());         // Enda raden som finns by default!
             return View(joinedTables);
         }
 
-        // GET: MoviesControllerView/Details/5
+        // GET: /MoviesControllerView/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -65,15 +59,13 @@ namespace test_SFF.Controllers
             return View(movie);
         }
 
-        // GET: MoviesControllerView/Create
+        // GET: /MoviesControllerView/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: MoviesControllerView/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: /MoviesControllerView/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,TotalAmount,PhysicalCopy")] Movie movie)
@@ -83,58 +75,6 @@ namespace test_SFF.Controllers
             {
                 _context.Add(movie);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(movie);
-        }
-
-        // GET: MoviesControllerView/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            // TODO: Måste kolla ifall namnet redan existerar och physicalcopy.
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var movie = await _context.Movies.FindAsync(id);
-            if (movie == null)
-            {
-                return NotFound();
-            }
-            return View(movie);
-        }
-
-        // POST: MoviesControllerView/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,TotalAmount,PhysicalCopy")] Movie movie)
-        {
-            if (id != movie.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(movie);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MovieExists(movie.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
                 return RedirectToAction(nameof(Index));
             }
             return View(movie);
@@ -173,5 +113,56 @@ namespace test_SFF.Controllers
         {
             return _context.Movies.Any(e => e.Id == id);
         }
+
+// ---------------------------------------------------------------------------------- Används ej:
+        // GET: MoviesControllerView/Edit/5
+/*        public async Task<IActionResult> Edit(int? id)
+        {
+            // TODO: Måste kolla ifall namnet redan existerar och physicalcopy.
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var movie = await _context.Movies.FindAsync(id);
+            if (movie == null)
+            {
+                return NotFound();
+            }
+            return View(movie);
+        }
+
+        // POST: /MoviesControllerView/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,TotalAmount,PhysicalCopy")] Movie movie)
+        {
+            if (id != movie.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(movie);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!MovieExists(movie.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(movie);
+        }*/
     }
 }

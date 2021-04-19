@@ -5,8 +5,8 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome2</h1>
-    <p>Below is a list of all movies available in the SFF library.</p>
+    <h1 class="display-4">Ratings and reviews</h1>
+    <p>Rating and reviews by specific studios below.</p>
 </div>
 
 <table class="table">
@@ -15,9 +15,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.StudioId)
             </th>
-            @* <th>
-                @Html.DisplayNameFor(model => model.TotalAmount)
-            </th> *@
             <th>
                 @Html.DisplayNameFor(model => model.Score)
             </th>
@@ -33,11 +30,13 @@
             <td>
                 @Html.DisplayFor(modelItem => item.StudioId)
             </td>
-            @* <td>
-                @Html.DisplayFor(modelItem => item.TotalAmount)
-            </td> *@
             <td>
-                @Html.DisplayFor(modelItem => item.Score)
+                @if (item.Score == 0)
+                {
+                    <p>Movie not returned/rated yet.</p>
+                }
+                else if (item.Score > 0)
+                    @Html.DisplayFor(modelItem => item.Score)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Review)
@@ -46,3 +45,6 @@
 }
     </tbody>
 </table>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
