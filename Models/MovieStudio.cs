@@ -14,7 +14,7 @@ namespace test_SFF
         public DateTime ReturnDate { get; set; }
         public bool Returned { get; set; }
         public string Review { get; set; }
-        public int Score { get; set; }
+        public double Score { get; set; }
     }
 
     public class MovieStudioDTO

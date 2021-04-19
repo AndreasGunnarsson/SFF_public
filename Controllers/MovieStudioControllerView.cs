@@ -46,19 +46,6 @@ namespace test_SFF.Controllers
             return View(movieStudio);
         }
 
-        // GET: MovieStudioControllerView/Create
-/*        public IActionResult Create()           // När man klickar på "Create New" i index kommer man hit.
-        {
-            // TODO: Returned ska inte gå att kryssa i här; görs i bakgrunden.
-            // TODO: Hade varit snyggt om man kunde skriva in datum på ett snyggare sätt.
-                // Man ska kunna skriva in ett datum som filmen måste vara inlämnad på. Måste vara efter dagens datum.
-            //ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Name");
-            // TODO: Om man vill ha en snyggare lista (t.ex. för att visa physical och inte samt filmer som inte går att låna) måste man nog göra en egen list med "SelectListItem".
-            ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Id");      // Name i sista istället för Id.
-            ViewData["StudioId"] = new SelectList(_context.Studios, "Id", "Id");
-            return View();
-        }*/
-
         public async Task<IActionResult> Create(int id)           // När man klickar på "Create New" i index kommer man hit.
         {
             // TODO: Returned ska inte gå att kryssa i här; görs i bakgrunden.
@@ -138,7 +125,7 @@ namespace test_SFF.Controllers
                 Returned = false
             }; */
 
-            MovieStudio fisen = new MovieStudio
+            MovieStudio moviestudioobject = new MovieStudio
             {
                 MovieId = id,
                 StudioId = movieStudio.StudioId,
@@ -148,9 +135,9 @@ namespace test_SFF.Controllers
             if (ModelState.IsValid)
             {
 //              _context.Add(movieStudio);
-                _context.Add(fisen);
+                _context.Add(moviestudioobject);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index));     // TODO: Måste vara denna som redirectar till MovieStudioControllerView. Ska redirecta till MovieControllerView.
             }
 
             ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Name", movieStudio.MovieId);       // TODO: Vet inte ifall dessa fungerar alls.
@@ -159,6 +146,7 @@ namespace test_SFF.Controllers
         }
 
         // GET: MovieStudioControllerView/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
 /*            if (id == null && StudioId == null)
@@ -166,15 +154,19 @@ namespace test_SFF.Controllers
                 return NotFound();
             }*/
 
-            var movieStudio = await _context.MovieStudios.FindAsync(id);
-            if (movieStudio == null)
+            MovieStudio movieStudioQuery = await _context.MovieStudios.FindAsync(id);
+            if (movieStudioQuery == null)
             {
                 return NotFound();
             }
 
-            ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Id", movieStudio.MovieId);
-            ViewData["StudioId"] = new SelectList(_context.Studios, "Id", "Id", movieStudio.StudioId);
-            return View(movieStudio);
+            ViewData["Movie"] = await _context.Movies.FindAsync(movieStudioQuery.MovieId);
+            ViewData["Studio"] = await _context.Studios.FindAsync(movieStudioQuery.StudioId);
+            // TODO: Returnera joinad lista 
+
+            // ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Id", movieStudio.MovieId);
+            // ViewData["StudioId"] = new SelectList(_context.Studios, "Id", "Id", movieStudio.StudioId);
+            return View();
         }
 
         // GET: MovieStudioControllerView/Edit/5
@@ -196,27 +188,18 @@ namespace test_SFF.Controllers
         } */
 
         // POST: MovieStudioControllerView/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // TODO: Fuling: Använder inte checkboxen på hemsidan till något utna vi sätter returned till true hur man än gör.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("Id, Returned")] MovieStudio movieStudio)
+        public async Task<IActionResult> Edit([Bind("Id")] MovieStudio movieStudio)
         {
             MovieStudio movieStudioQuery = await _context.MovieStudios.FindAsync(movieStudio.Id);
             if (movieStudioQuery == null)
                 return NotFound();
-            //if (movieBefore == null)
-            //    return NotFound();
 
-            movieStudioQuery.Returned = movieStudio.Returned;
-            //movieBefore.TotalAmount = movieDTO.TotalAmount;
-            // TOD: Måste man hantera vad som händer med filmer som redan är utlånade?
-                // T.ex. ifall man lånat ut totalt 10 och man sedan sätter TotalAmount till 6?
-                    // När filmerna sedan är returnerade kommer ..
-                        // Tror itne detta är ett problem.
-//            try
-//            {
-                await _context.SaveChangesAsync();
+            movieStudioQuery.Returned = true;
+
+            await _context.SaveChangesAsync();
 /*            }
             catch (DbUpdateConcurrencyException)
             {
@@ -229,41 +212,14 @@ namespace test_SFF.Controllers
                     throw;
                 }
             }*/
+//            ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Id", movieStudio.MovieId);
+//            ViewData["StudioId"] = new SelectList(_context.Studios, "Id", "Id", movieStudio.StudioId);
 
-//            return NoContent();
-// -------------------------------------------
-/*            if (id != movieStudio.Id)
-            {
-                return NotFound();
-            }
+            ViewData["Movie"] = await _context.Movies.FindAsync(movieStudioQuery.MovieId);
+            ViewData["Studio"] = await _context.Studios.FindAsync(movieStudioQuery.StudioId);
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(movieStudio);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MovieStudioExists(movieStudio.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            } */
-            ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Id", movieStudio.MovieId);
-            ViewData["StudioId"] = new SelectList(_context.Studios, "Id", "Id", movieStudio.StudioId);
-            return View(movieStudio);
+            return View();
         }
-
-
-
 
 
 // ------------------------------------------------------ Not needed:

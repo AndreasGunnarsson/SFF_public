@@ -1,0 +1,48 @@
+@model IEnumerable<test_SFF.MovieStudio>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome2</h1>
+    <p>Below is a list of all movies available in the SFF library.</p>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.StudioId)
+            </th>
+            @* <th>
+                @Html.DisplayNameFor(model => model.TotalAmount)
+            </th> *@
+            <th>
+                @Html.DisplayNameFor(model => model.Score)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Review)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.StudioId)
+            </td>
+            @* <td>
+                @Html.DisplayFor(modelItem => item.TotalAmount)
+            </td> *@
+            <td>
+                @Html.DisplayFor(modelItem => item.Score)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Review)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

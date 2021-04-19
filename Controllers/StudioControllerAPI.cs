@@ -127,10 +127,10 @@ namespace test_SFF.Controllers
             movieStudioQuery.Score = movieStudioRating.Score;
             movieStudioQuery.Review = movieStudioRating.Review;
 
-//            try
-//            {
+//           try
+//          {
             await _context.SaveChangesAsync();
-/*            }
+/*          }
             catch (DbUpdateConcurrencyException)
             {
                 if (!StudioExists(id))

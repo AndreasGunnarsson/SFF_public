@@ -22,7 +22,7 @@ namespace test_SFF.Controllers
             _context = context;
         }
 
-        // POST: api/Movies
+        // POST: /api/Movies
         [HttpPost]
         public async Task<ActionResult<MovieDTO>> PostMovie(MovieDTO movieDTO)
         {
@@ -44,7 +44,7 @@ namespace test_SFF.Controllers
             return CreatedAtAction("GetMovie", new { id = movie.Id }, movieDTO);
         }
 
-        // PUT: api/Movies/#
+        // PUT: /api/Movies/#
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMovieAmount(int id, MovieDTO movieDTO)
         {

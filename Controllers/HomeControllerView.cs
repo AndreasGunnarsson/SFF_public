@@ -48,12 +48,30 @@ namespace test_SFF.Controllers
                     movieCoverImagesStatus.Add("NonExistent");
             }
             ViewData["availableImages"] = movieCoverImagesStatus;
-            // Kolla File.IO
-            // Kolla ifall filen existerar
-            // Spara i ny List
 
-              return View(moviesQuery);  
+            var movieStudioQuery = _context.MovieStudios.ToList();
+
+            var movieAverageScore = from ms in movieStudioQuery
+                group ms by ms.MovieId into newtable
+                select new
+                {
+                    MovieId = newtable.Key,
+                    AverageScore = newtable.Average(x => x.Score)
+                };
+
+            var joinedTables = (from movie in moviesQuery
+                join ma in movieAverageScore on movie.Id equals ma.MovieId
+                select new MovieWithRating { Id = movie.Id, Name = movie.Name, TotalAmount = movie.TotalAmount, PhysicalCopy = movie.PhysicalCopy, AverageScore = ma.AverageScore}).ToList();
+
+            return View(joinedTables);
+//            return View(moviesQuery);
         //    return View(_context.Movies.ToList());
+        }
+
+        public IActionResult Review(int id)
+        {
+            // TODO: Ska endast returnera för en specifik movieid
+            return View(_context.MovieStudios.Where(x => x.MovieId == id));
         }
 
 /*      [AllowAnonymous]                // Gör så att man kan komma åt sidan utan inlogg.
