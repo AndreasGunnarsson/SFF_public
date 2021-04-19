@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using test_SFF;
 using test_SFF.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace test_SFF.Controllers
 {
+    [Authorize]
     public class MovieStudioControllerView : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -63,46 +65,35 @@ namespace test_SFF.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("StudioId, ReturnDate")] MovieStudio movieStudio, int id)
         {
-            // TODO: Kolla så att all logik här fungerar!
-            // Kollar ifall det finns tillräckligt många kopior för att låna ut en film. Jämför antalet utlånade i MoviStudios med Movies.TotalAmount.
-/*            int movieStudioQuery = _context.MovieStudios.Where(x => x.MovieId == id).Count();
+            // Kollar ifall det finns tillräckligt många kopior för att låna ut en film. Jämför antalet utlånade i MovieStudios med Movies.TotalAmount.
+            int movieStudioQuery = _context.MovieStudios.Where(x => x.MovieId == id).Count();
             Movie movieQuery = await _context.Movies.FindAsync(id);
             if (movieStudioQuery >= movieQuery.TotalAmount)
-                return NotFound();*/
-                // TODO: Snyggare felmeddelande behövs här! Kanske skriver ut direkt på create-sidan?
-//              return Redirect("../Views/Shared/Error.cshtml");
-
-            // Kollar så att inte MovieId och StudioId finns på samma rad i tabellen MovieStudios. För att motverka att samma studio lånar samma film.
-/*            bool isNotDuplicates = false;
-            isNotDuplicates = _context.MovieStudios.Any(x => x.MovieId == id && x.StudioId == movieStudio.StudioId);
-            if (isNotDuplicates == true)
-                return NotFound();*/
-
-            // TODO: Kolla så att ReturnDate är efter dagens datum.
-            if (movieStudio.ReturnDate <= DateTime.Now)
                 return NotFound();
 
-            /* MovieStudio moviestudio = new MovieStudio
-            {
-                MovieId = moviestudioDTO.MovieId,
-                StudioId = moviestudioDTO.StudioId,
-                ReturnDate = moviestudioDTO.ReturnDate,
-                Returned = false
-            }; */
+            // Kollar så att inte MovieId och StudioId finns på samma rad i tabellen MovieStudios. För att motverka att samma studio lånar samma film.
+            bool isNotDuplicates = false;
+            isNotDuplicates = _context.MovieStudios.Any(x => x.MovieId == id && x.StudioId == movieStudio.StudioId);
+            if (isNotDuplicates == true)
+                return NotFound();
+
+            if (movieStudio.ReturnDate <= DateTime.Now)
+                return NotFound();
 
             MovieStudio moviestudioobject = new MovieStudio
             {
                 MovieId = id,
                 StudioId = movieStudio.StudioId,
-                ReturnDate = movieStudio.ReturnDate
+                ReturnDate = movieStudio.ReturnDate,
+                Returned = false,
+                Score = 0
             };
 
             if (ModelState.IsValid)
             {
-//              _context.Add(movieStudio);
                 _context.Add(moviestudioobject);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));     // TODO: Måste vara denna som redirectar till MovieStudioControllerView. Ska redirecta till MovieControllerView.
+                return RedirectToAction("Index", "MoviesControllerView");
             }
 
             ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Name", movieStudio.MovieId);       // TODO: Vet inte ifall dessa fungerar alls.
@@ -171,7 +162,7 @@ namespace test_SFF.Controllers
 // ------------------------------------------------------ Not needed:
 
         // GET: MovieStudioControllerView
-        public async Task<IActionResult> Index()
+/*        public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.MovieStudios.Include(m => m.Movie).Include(m => m.Studio);
             return View(await applicationDbContext.ToListAsync());
@@ -231,6 +222,6 @@ namespace test_SFF.Controllers
         private bool MovieStudioExists(int id)
         {
             return _context.MovieStudios.Any(e => e.Id == id);
-        }
+        }*/
     }
 }

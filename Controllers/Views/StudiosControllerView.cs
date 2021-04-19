@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using test_SFF;
 using System.Web;
 using test_SFF.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace test_SFF.Controllers
 {
+    [Authorize]
     public class StudiosControllerView : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -66,7 +68,7 @@ namespace test_SFF.Controllers
         // POST: StudiosControllerView/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Location")] Studio studio)
+        public async Task<IActionResult> Create([Bind("Id, Name, Location")] Studio studio)
         {
             if (ModelState.IsValid)
             {

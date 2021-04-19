@@ -30,11 +30,12 @@ namespace test_SFF.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+//      public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             List<string> movieCoverImagesStatus = new List<string>();
             string filepath;
-            var moviesQuery = _context.Movies.ToList();
+            var moviesQuery = await _context.Movies.ToListAsync();
 
             foreach(var i in moviesQuery)
             {
@@ -46,7 +47,7 @@ namespace test_SFF.Controllers
             }
             ViewData["availableImages"] = movieCoverImagesStatus;
 
-            List<MovieStudio> movieStudioQuery = _context.MovieStudios.Where(x => x.Score > 0).ToList();
+            List<MovieStudio> movieStudioQuery = await _context.MovieStudios.Where(x => x.Score > 0).ToListAsync();
 
             var movieAverageScore = from ms in movieStudioQuery
                 group ms by ms.MovieId into newtable

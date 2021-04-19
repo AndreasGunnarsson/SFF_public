@@ -68,9 +68,13 @@ namespace test_SFF.Controllers
         // POST: /MoviesControllerView/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,TotalAmount,PhysicalCopy")] Movie movie)
+        public async Task<IActionResult> Create([Bind("Id, Name, TotalAmount, PhysicalCopy")] Movie movie)
         {
-            // TODO: Måste kolla ifall namnet redan existerar och physicalcopy.
+            bool isSame = false;
+            isSame = _context.Movies.Any(x => x.Name == movie.Name && x.PhysicalCopy == movie.PhysicalCopy);
+            if (isSame)
+                return NotFound();
+
             if (ModelState.IsValid)
             {
                 _context.Add(movie);

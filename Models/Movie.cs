@@ -6,7 +6,7 @@ namespace test_SFF
     public class Movie
     {
         public int Id { get; set; }
-        [StringLength(10)]
+        [StringLength(50)]
         public string Name { get; set; }
         [Range(0, 999)]
         [Display(Name = "Total Amount")]
