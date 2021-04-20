@@ -29,7 +29,7 @@ namespace test_SFF.Controllers
             bool isSame = false;
             isSame = _context.Movies.Any(x => x.Name == movieDTO.Name && x.PhysicalCopy == movieDTO.PhysicalCopy);
             if (isSame)
-                return NotFound();
+                return BadRequest();
 
             var movie = new Movie
             {
@@ -37,10 +37,10 @@ namespace test_SFF.Controllers
                 TotalAmount = movieDTO.TotalAmount,
                 PhysicalCopy = movieDTO.PhysicalCopy
             };
-            
+
             _context.Movies.Add(movie);
             await _context.SaveChangesAsync();
-            // TODO: Returnerar inte rätt Id (det nya).
+
             return CreatedAtAction("GetMovie", new { id = movie.Id }, movieDTO);
         }
 
@@ -54,101 +54,26 @@ namespace test_SFF.Controllers
 
             movieQuery.TotalAmount = movieDTO.TotalAmount;
 
-//          try
-//          {
             if (!MovieExists(id))
-            {
                 return NotFound();
-            }
+
             await _context.SaveChangesAsync();
-/*            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MovieExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            } */
 
             return NoContent();
         }
 
-        // TODO: Ful route:
-        // POST: /api/Movies/Borrow
-        [Route("Borrow")]
-        [HttpPost]
-        public async Task<ActionResult<MovieStudioDTO>> PostMovieBorrow(MovieStudioDTO movieStudioDTO)
+        // GET: api/Movies/#
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Movie>> GetMovie(int id)
         {
-            // Kollar ifall det finns tillräckligt många kopior för att låna ut en film. Jämför antalet utlånade i MovieStudios med Movies.TotalAmount.
-            int movieStudioQuery = _context.MovieStudios.Where(x => x.MovieId == movieStudioDTO.MovieId).Count();
-            Movie movieQuery = await _context.Movies.FindAsync(movieStudioDTO.MovieId);
-            if (movieStudioQuery >= movieQuery.TotalAmount)
-                return NotFound();
+            var movie = await _context.Movies.FindAsync(id);
 
-            // Kollar så att inte MovieId och StudioId finns på samma rad i tabellen MovieStudios. För att motverka att samma studio lånar samma film.
-            bool isNotDuplicates = false;
-            isNotDuplicates = _context.MovieStudios.Any(x => x.MovieId == movieStudioDTO.MovieId && x.StudioId == movieStudioDTO.StudioId);
-            if (isNotDuplicates == true)
-                return NotFound();
-
-            // Datumet kan inte vara under eller lika med dagens datum.
-            if (movieStudioDTO.ReturnDate <= DateTime.Now)
-                return NotFound();
-
-            MovieStudio movieStudio = new MovieStudio
-            {
-                MovieId = movieStudioDTO.MovieId,
-                StudioId = movieStudioDTO.StudioId,
-                ReturnDate = movieStudioDTO.ReturnDate,
-                Returned = false,
-                Score = 0
-            };
-            
-            if (!MovieExists(movieStudio.MovieId) || !StudioExists(movieStudio.StudioId))
-                return NotFound();
-            else
-            {
-                _context.MovieStudios.Add(movieStudio);
-                await _context.SaveChangesAsync();
-                return CreatedAtAction("GetMovieStudio", new { id = movieStudioDTO.Id }, movieStudioDTO);
-            }
-        }
-
-        // PUT: /api/Movies/Return/#
-        [HttpPut("Return/{id:int}")]
-        public async Task<IActionResult> PutReturnMovie(int id)
-        {
-            MovieStudio movieStudioQuery = await _context.MovieStudios.FindAsync(id);
-            if (movieStudioQuery == null)
-                return NotFound();
-
-            movieStudioQuery.Returned = true;
-
-//          try
-//          {
-            if (!_context.MovieStudios.Any(e => e.Id == id))
+            if (movie == null)
             {
                 return NotFound();
             }
-            await _context.SaveChangesAsync();
-/*            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MovieExists(1))      // TODO: Denna gör inget vettigs; vi borde kolla MovieStudio.
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            } */
 
-            return NoContent();
+            return movie;
         }
 
         private bool MovieExists(int id)
@@ -164,7 +89,7 @@ namespace test_SFF.Controllers
 // ----------------------------------------------------------- Actions som inte behövs:
 
         // DELETE: api/NewMovie/5
-        [HttpDelete("{id}")]
+/*        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMovie(int id)
         {
             var movie = await _context.Movies.FindAsync(id);
@@ -184,20 +109,6 @@ namespace test_SFF.Controllers
         public async Task<ActionResult<IEnumerable<Movie>>> GetMovies()
         {
             return await _context.Movies.ToListAsync();
-        }
-
-        // GET: api/NewMovie/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Movie>> GetMovie(int id)
-        {
-            var movie = await _context.Movies.FindAsync(id);
-
-            if (movie == null)
-            {
-                return NotFound();
-            }
-
-            return movie;
-        }
+        }*/
     }
 }

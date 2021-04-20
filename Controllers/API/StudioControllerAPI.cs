@@ -28,7 +28,7 @@ namespace test_SFF.Controllers
             bool isSame = false;
             isSame = _context.Studios.Any(x => x.Name == studioDTO.Name);
             if (isSame)
-                return NotFound();
+                return BadRequest();
 
             var studio = new Studio
             {
@@ -38,7 +38,7 @@ namespace test_SFF.Controllers
 
             _context.Studios.Add(studio);
             await _context.SaveChangesAsync();
-            // TODO: id fungerar inte; returnerar alltid 0.
+
             return CreatedAtAction("GetStudio", new { id = studio.Id }, studioDTO);
         }
 
@@ -68,25 +68,10 @@ namespace test_SFF.Controllers
             studioBefore.Name = studioDTO.Name;
             studioBefore.Location = studioDTO.Location;
 
-//          try
-//          {
             if (!StudioExists(id))
-            {
                 return NotFound();
-            }
+
             await _context.SaveChangesAsync();
-/*          }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!StudioExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            } */
 
             return NoContent();
         }
@@ -96,72 +81,31 @@ namespace test_SFF.Controllers
         public async Task<ActionResult<IEnumerable<MovieName>>> GetMovieStudio(int id)
         {
             // Hämtar lista med alla filmer lånade filmer som har ett specifikt StudioId.
-            var movieStudioQuery = _context.MovieStudios.Where<MovieStudio>(m => m.StudioId == id).ToList();
+            var movieStudioQuery = await _context.MovieStudios.Where<MovieStudio>(m => m.StudioId == id).ToListAsync();
             if (movieStudioQuery.Count() == 0)
-                return NotFound();
+                return BadRequest();
             
             // Hämtar alla filmer.
             var moviesQuery = await _context.Movies.ToListAsync();
             if (movieStudioQuery.Count() == 0)
                 return NotFound();
 
-            // Joinar de filmer som finns i movieStudioQuery med movieQuery så att man kan få ut namnen på dem.
+            // Joinar de filmer som finns i movieStudioQuery med movieQuery så att man kan få ut namn på filmerna.
             var joinedTables = (from ms in movieStudioQuery
                 join movie in moviesQuery on ms.MovieId equals movie.Id
-                select new MovieName { Name = movie.Name, PhysicalCopy = movie.PhysicalCopy, ReturnDate = ms.ReturnDate, Returned = ms.Returned}).ToList();
+                select new MovieName {
+                    Name = movie.Name,
+                    PhysicalCopy = movie.PhysicalCopy,
+                    ReturnDate = ms.ReturnDate,
+                    Returned = ms.Returned
+                }
+            ).ToList();
 
             return joinedTables;
         }
 
-        // PUT: /api/Studios/Rating/#
-        [HttpPut("Rating/{id:int}")]
-        public async Task<IActionResult> PutRating(int id, MovieStudioRating movieStudioRating)
-        {
-            var movieStudioQuery = await _context.MovieStudios.FindAsync(id);
-            if (movieStudioQuery == null)
-                return NotFound();
-            
-            if (movieStudioQuery.Returned == false)
-                return NotFound();
-
-            movieStudioQuery.Score = movieStudioRating.Score;
-            movieStudioQuery.Review = movieStudioRating.Review;
-
-//           try
-//          {
-            await _context.SaveChangesAsync();
-/*          }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!StudioExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            } */
-
-            return NoContent();
-        }
-
-        private bool StudioExists(int id)
-        {
-            return _context.Studios.Any(e => e.Id == id);
-        }
-
-// ---------------------------------------
-
-        // GET: api/NewStudio
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Studio>>> GetStudios()
-        {
-            return await _context.Studios.ToListAsync();
-        }
-
-        // GET: api/NewStudio/5
-/*        [HttpGet("{id}")]
+        // GET: /api/Studios/#
+        [HttpGet("{id}")]
         public async Task<ActionResult<Studio>> GetStudio(int id)
         {
             var studio = await _context.Studios.FindAsync(id);
@@ -172,6 +116,20 @@ namespace test_SFF.Controllers
             }
 
             return studio;
+        }
+
+        private bool StudioExists(int id)
+        {
+            return _context.Studios.Any(e => e.Id == id);
+        }
+
+// ---------------------------------------
+
+        // GET: api/NewStudio
+/*        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Studio>>> GetStudios()
+        {
+            return await _context.Studios.ToListAsync();
         } */
     }
 }
