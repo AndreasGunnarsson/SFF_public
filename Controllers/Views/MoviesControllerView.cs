@@ -36,7 +36,14 @@ namespace test_SFF.Controllers
             var joinedTables = (from movie in movieQuery
                 join ms in movieStudioQuery on movie.Id equals ms.MovieId into newtable
                 from variablename in newtable.DefaultIfEmpty()
-                select new MovieAvailableAmount { Id = movie.Id, Name = movie.Name, PhysicalCopy = movie.PhysicalCopy, TotalAmount = movie.TotalAmount, BorrowedAmount = variablename?.BorrowedAmount ?? 0}).ToList();
+                select new MovieAvailableAmount {
+                    Id = movie.Id,
+                    Name = movie.Name,
+                    PhysicalCopy = movie.PhysicalCopy,
+                    TotalAmount = movie.TotalAmount,
+                    BorrowedAmount = variablename?.BorrowedAmount ?? 0
+                }
+            ).ToList();
 
             return View(joinedTables);
         }
@@ -68,10 +75,11 @@ namespace test_SFF.Controllers
         // POST: /MoviesControllerView/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id, Name, TotalAmount, PhysicalCopy")] Movie movie)
+        public async Task<IActionResult> Create([Bind("Name, TotalAmount, PhysicalCopy")] Movie movie)
         {
             bool isSame = false;
             isSame = _context.Movies.Any(x => x.Name == movie.Name && x.PhysicalCopy == movie.PhysicalCopy);
+
             if (isSame)
                 return NotFound();
 
@@ -81,6 +89,7 @@ namespace test_SFF.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(movie);
         }
 
@@ -108,6 +117,7 @@ namespace test_SFF.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var movie = await _context.Movies.FindAsync(id);
+            
             _context.Movies.Remove(movie);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

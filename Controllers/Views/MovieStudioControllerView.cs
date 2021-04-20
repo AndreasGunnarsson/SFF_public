@@ -25,60 +25,36 @@ namespace test_SFF.Controllers
         {
             Movie movieQuery = await _context.Movies.FindAsync(id);
 
-            if(movieQuery == null)
-                return NotFound();          // TODO: Snyggare felmeddelande
+            if (movieQuery == null)
+                return NotFound();
 
             ViewData["Movie"] = movieQuery;
             ViewData["StudioId"] = new SelectList(_context.Studios, "Id", "Name");
             return View();
         }
 
-        /* [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int? id)
-        {
-            // Skapa eget objekt
-            int movieStudioQuery = _context.MovieStudios.Where(x => x.MovieId == movieStudio.MovieId).Count();
-            Movie movieQuery = await _context.Movies.FindAsync(movieStudio.MovieId);
-            if (movieStudioQuery >= movieQuery.TotalAmount)
-                return NotFound();
-
-            bool isNotDuplicates = false;
-            isNotDuplicates = _context.MovieStudios.Any(x => x.MovieId == movieStudio.MovieId && x.StudioId == movieStudio.StudioId);
-            if (isNotDuplicates == true)
-                return NotFound();
-                
-            if (ModelState.IsValid)
-            {
-                _context.Add(movieStudio);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-
-            ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Name", movieStudio.MovieId);       // TODO: Vet inte ifall dessa fungerar alls.
-            ViewData["StudioId"] = new SelectList(_context.Studios, "Id", "Name", movieStudio.StudioId);
-            return View(movieStudio);
-        }*/
-
         // POST: MovieStudioControllerView/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("StudioId, ReturnDate")] MovieStudio movieStudio, int id)
         {
-            // Kollar ifall det finns tillräckligt många kopior för att låna ut en film. Jämför antalet utlånade i MovieStudios med Movies.TotalAmount.
-            int movieStudioQuery = _context.MovieStudios.Where(x => x.MovieId == id).Count();
+            // Finns tillräckligt många kopior för att låna ut en film?
+            int movieStudioQuery = _context.MovieStudios.Where(x => x.MovieId == movieStudio.MovieId).Count();
             Movie movieQuery = await _context.Movies.FindAsync(id);
-            if (movieStudioQuery >= movieQuery.TotalAmount)
+            if (movieQuery == null)
                 return NotFound();
+            if (movieStudioQuery >= movieQuery.TotalAmount)
+                return BadRequest();
 
-            // Kollar så att inte MovieId och StudioId finns på samma rad i tabellen MovieStudios. För att motverka att samma studio lånar samma film.
+            // Har samma studio lånat samma film en gång tidigare?
             bool isNotDuplicates = false;
             isNotDuplicates = _context.MovieStudios.Any(x => x.MovieId == id && x.StudioId == movieStudio.StudioId);
             if (isNotDuplicates == true)
-                return NotFound();
+                return BadRequest();
 
+            // Är datumet efter dagens datum?
             if (movieStudio.ReturnDate <= DateTime.Now)
-                return NotFound();
+                return BadRequest();
 
             MovieStudio moviestudioobject = new MovieStudio
             {
@@ -96,32 +72,22 @@ namespace test_SFF.Controllers
                 return RedirectToAction("Index", "MoviesControllerView");
             }
 
-            ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Name", movieStudio.MovieId);       // TODO: Vet inte ifall dessa fungerar alls.
-            ViewData["StudioId"] = new SelectList(_context.Studios, "Id", "Name", movieStudio.StudioId);
-            return View(movieStudio);
+            ViewData["Movie"] = movieQuery;
+            ViewData["StudioId"] = new SelectList(_context.Studios, "Id", "Name");
+            return View();
         }
 
         // GET: MovieStudioControllerView/Edit/5
         [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
-/*            if (id == null && StudioId == null)
-            {
-                return NotFound();
-            }*/
-
             MovieStudio movieStudioQuery = await _context.MovieStudios.FindAsync(id);
             if (movieStudioQuery == null)
-            {
                 return NotFound();
-            }
 
             ViewData["Movie"] = await _context.Movies.FindAsync(movieStudioQuery.MovieId);
             ViewData["Studio"] = await _context.Studios.FindAsync(movieStudioQuery.StudioId);
-            // TODO: Returnera joinad lista 
 
-            // ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Id", movieStudio.MovieId);
-            // ViewData["StudioId"] = new SelectList(_context.Studios, "Id", "Id", movieStudio.StudioId);
             return View();
         }
 
@@ -137,25 +103,7 @@ namespace test_SFF.Controllers
             movieStudioQuery.Returned = true;
 
             await _context.SaveChangesAsync();
-/*            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MovieExists(1))      // TODO: Denna gör inget vettigs; vi borde kolla MovieStudio.
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }*/
-//            ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Id", movieStudio.MovieId);
-//            ViewData["StudioId"] = new SelectList(_context.Studios, "Id", "Id", movieStudio.StudioId);
-
-            ViewData["Movie"] = await _context.Movies.FindAsync(movieStudioQuery.MovieId);
-            ViewData["Studio"] = await _context.Studios.FindAsync(movieStudioQuery.StudioId);
-
-            return View();
+            return RedirectToAction("Details", "StudiosControllerView", new { id = movieStudioQuery.StudioId });
         }
 
 

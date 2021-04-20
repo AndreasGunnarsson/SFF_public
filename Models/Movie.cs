@@ -6,9 +6,10 @@ namespace test_SFF
     public class Movie
     {
         public int Id { get; set; }
+        [Required]
         [StringLength(50)]
         public string Name { get; set; }
-        [Range(0, 999)]
+        [Range(1, 999)]
         [Display(Name = "Total Amount")]
         public int TotalAmount { get; set; }
         [Display(Name = "Physical Copy")]

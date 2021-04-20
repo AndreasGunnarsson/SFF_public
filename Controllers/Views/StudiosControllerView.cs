@@ -32,9 +32,7 @@ namespace test_SFF.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             // Hämtar lista med alla filmer lånade filmer som har ett specifikt StudioId.
             var movieStudioQuery = _context.MovieStudios.Where<MovieStudio>(m => m.StudioId == id).ToList();
@@ -42,20 +40,25 @@ namespace test_SFF.Controllers
             // Hämtar den studio som efterfrågas i URL:en.
             Studio studio = await _context.Studios.FirstOrDefaultAsync(m => m.Id == id);
             if (studio == null)
-            {
                 return NotFound();
-            }
-            
+
             // Hämtar alla filmer.
             var moviesQuery = await _context.Movies.ToListAsync();
 
             // Joinar de filmer som finns i moviestudio med movieQuery så att man kan få ut namnen på dem.
             var joinedTables = (from ms in movieStudioQuery
                 join movie in moviesQuery on ms.MovieId equals movie.Id
-                select new MovieName { MovieStudioId = ms.Id, Name = movie.Name, PhysicalCopy = movie.PhysicalCopy, ReturnDate = ms.ReturnDate, Returned = ms.Returned }).ToList();
+                select new MovieName {
+                    MovieStudioId = ms.Id,
+                    Name = movie.Name,
+                    PhysicalCopy = movie.PhysicalCopy,
+                    ReturnDate = ms.ReturnDate,
+                    Returned = ms.Returned
+                }
+            ).ToList();
 
             MovieStudioDetails collectionObject = new MovieStudioDetails { Studio = studio, JoinedList = joinedTables };
-            // TODO: Behöver ha Movie-objektet för att sätta namnet på "rätt sätt" i hemside-koden.
+
             return View(collectionObject);
         }
 
@@ -68,7 +71,7 @@ namespace test_SFF.Controllers
         // POST: StudiosControllerView/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id, Name, Location")] Studio studio)
+        public async Task<IActionResult> Create([Bind("Name, Location")] Studio studio)
         {
             if (ModelState.IsValid)
             {
@@ -106,11 +109,6 @@ namespace test_SFF.Controllers
             _context.Studios.Remove(studio);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool StudioExists(int id)
-        {
-            return _context.Studios.Any(e => e.Id == id);
         }
 
 // --------------------------------------------------------------- Används ej:
