@@ -29,6 +29,7 @@ namespace test_SFF.Controllers
             // Count på alla filmer:
             var movieStudioQuery =
                 _context.MovieStudios
+                .Where(x => x.Returned == false)
                 .GroupBy(x => x.MovieId)
                 .Select(y => new { MovieId = y.Key, BorrowedAmount = y.Count() })
                 .ToList();
