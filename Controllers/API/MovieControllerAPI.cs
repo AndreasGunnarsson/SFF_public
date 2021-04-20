@@ -62,7 +62,7 @@ namespace test_SFF.Controllers
             return NoContent();
         }
 
-        // GET: api/Movies/#
+        // GET: /api/Movies/#
         [HttpGet("{id}")]
         public async Task<ActionResult<Movie>> GetMovie(int id)
         {

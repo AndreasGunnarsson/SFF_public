@@ -76,8 +76,8 @@ namespace test_SFF.Controllers
             return NoContent();
         }
 
-        // GET: /api/Studios/#
-        [HttpGet("{id}")]
+        // GET: /api/Studios/Borrowed/#
+        [HttpGet("Borrowed/{id:int}")]
         public async Task<ActionResult<IEnumerable<MovieName>>> GetMovieStudio(int id)
         {
             // Hämtar lista med alla filmer lånade filmer som har ett specifikt StudioId.
