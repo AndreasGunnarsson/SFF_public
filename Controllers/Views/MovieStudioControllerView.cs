@@ -39,7 +39,7 @@ namespace test_SFF.Controllers
         public async Task<IActionResult> Create([Bind("StudioId, ReturnDate")] MovieStudio movieStudio, int id)
         {
             // Finns tillräckligt många kopior för att låna ut en film?
-            int movieStudioQuery = _context.MovieStudios.Where(x => x.MovieId == movieStudio.MovieId).Count();
+            int movieStudioQuery = _context.MovieStudios.Where(x => x.MovieId == id).Count();
             Movie movieQuery = await _context.Movies.FindAsync(id);
             if (movieQuery == null)
                 return NotFound();

@@ -10,7 +10,7 @@
 <hr />
 
 <h4>Movie: @movie.Name</h4>
-<h4>Physical copy: @movie.PhysicalCopy</h4>
+<h4>Physical Copy: @movie.PhysicalCopy</h4>
 
 <div class="row">
     <div class="col-md-4">
@@ -20,11 +20,11 @@
 
             </div>
             <div class="form-group">
-                <label asp-for="StudioId" class="control-label"></label>
+                <label asp-for="StudioId" class="control-label">Studio Name</label>
                 <select asp-for="StudioId" class ="form-control" asp-items="ViewBag.StudioId"></select>
             </div>
             <div class="form-group">
-                <label asp-for="ReturnDate" class="control-label"></label>
+                <label asp-for="ReturnDate" class="control-label">Return Date</label>
                 <input asp-for="ReturnDate" class="form-control" />
                 <span asp-validation-for="ReturnDate" class="text-danger"></span>
             </div>
