@@ -58,13 +58,14 @@ namespace test_SFF.Controllers
                 };
 
             var joinedTables = (from movie in moviesQuery
-                join ma in movieAverageScore on movie.Id equals ma.MovieId
+                join ma in movieAverageScore on movie.Id equals ma.MovieId into newtable
+                from variablename in newtable.DefaultIfEmpty()
                 select new MovieWithRating {
                     Id = movie.Id,
                     Name = movie.Name,
                     TotalAmount = movie.TotalAmount,
                     PhysicalCopy = movie.PhysicalCopy,
-                    AverageScore = ma.AverageScore
+                    AverageScore = variablename?.AverageScore ?? 0
                 }
             ).ToList();
 
