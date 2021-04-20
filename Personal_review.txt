@@ -1,0 +1,102 @@
+Du ska skriva en sedvanlig teknisk rapport över din lösning. Huvudfokus är att reflektera och motivera dina designval. Rapporten bör vara under 4000 tecken (inte ord!) inklusive mellanslag. Använd de rubriker som lagts in.
+
+Krav för Godkänt
+
+    Du har skrivit en rapport för uppgiften som sammanfattar din lösning och tillvägagångssätt samt värderar hur bra du själv tycker att du lyckats med uppgiften
+
+Ytterligare Krav för Väl Godkänt
+
+    Analysera och reflektera kring hur du uppfyllt kraven i uppgiften. Reflektera över din applikations funktion och kodstruktur - samt motivera dina ställningstaganden.
+
+Rapport för Inlämningsuppgift #1
+Beskrivning av mina endpoints
+
+En kort dokumentation över åtkomstpunkterna i API:et och vad de returnerar för information (En punktlista eller tabell räcker)
+Beskrivning av domänen
+
+Här beskriver du kortfattat dina Models och hur de hänger ihop med Entity Framework och databasen
+Beskrivning av arkitekturen
+
+Beskriv övergripande projektets upplägg i sin helhelt: Ett projekt eller flera, hur ser klass-strukturerna ut, använder du lager-arkitektur eller inte?
+Egen bedömning
+
+Hur bedömer du själv att du klarat uppgiften? Hur bedömer du strukturen på din kod? Finns det något du önskat att du löst på något annat sätt och i så fall, varför? Vad var motivet bakom det upplägg du valt? Vad finns det för för- och nackdelar med lösningen du tagit fram?
+---------------------------------------------
+Web Endpoints
+-------------
+/Identity/Account/Register
+	För att registrera ett nytt konto. Krävs att man är inloggad för att komma åt vissa sidor.
+/Home/Index
+	Publik sida (kräver ingen inloggning) som visar alla filmer med tillhörande bild (nya bilder måste läggas i \wwwroot\images och ska ha samma namn som filmen). Går också att se medelbetyg och betyg från individuella studios under "Reviews"-knapparna.
+/MoviesControllerView/Index
+	Visar alla filmer fast mer administrativ sida som visar hur många kopior det finns av en specifik film (Total Amount) samt hur många som är utlånade (Borrowed Amount).
+	Från denna sida kan man även lägga till och ta bort filmer samt låna en film (Borrow Movie) till en specifik studio.
+/StudiosControllerView/Index
+	Visar alla filmstudios.
+/StudiosControllerView/Details/#
+	Här ser man alla filmer som en studio har lånat. Om en studio har en lånad film kan man trycka på "Return movie" för att lämna tillbaka den.
+	"Return Status" berättar om en film är återlämnad i tid eller ej.
+
+API Endpoints
+-------------
+POST: /api/Movies
+	Lägger till en film. Kräver JSON-data.
+PUT: /api/Movies/#
+	Ändrar antal kopior för en film med specifikt id. Kräver JSON-data för att ändra.
+POST: /api/Studios
+	Lägger till en studio. Kräver JSON-data.
+DELETE: /api/Studios/#
+	Tar bort en studio med specifikt id.
+PUT: /api/Studios/#
+	Ändrar namn och ort på en studio med specifikt id. Kräver också JSON-data.
+GET: /api/Studios/Borrowed/#
+	Visar alla filmer lånade av en studio med specifikt Id.
+POST: /api/MovieStudio
+	Skapar ny utlåning av en film till en studio. Kräver JSON-data.
+PUT: /api/MovieStudio/#
+	Lämnar tillbaka en film som har specifikt MovieStudio Id.
+PUT: /api/MovieStudio/Rating/#
+	Lägger till en rating (om filmen är returnerad) till MovieStudio med specifikt Id. Kräver också JSON-data.
+
+Använd gärna JSON-filerna i mappen "JSON_TESTS".
+
+Domänen
+-------
+Använder rent MVC-upplägg. All business logic och förfrågningar mot databas har därmed hamnat i Controllers.
+
+Models
+------
+De tre modeller som är tabeller i databasen är "Movie", "Studio" och "MovieStudio". MovieStudio är en mellantabell som binder samman en Movie och en Studio när en film lånas ut. I MovieStudio finns även betyg från en specifik studio som lämnat tillbaka en specifik film.
+
+Arkitekturen
+------------
+Är ett monolitiskt program som använder MVC. Blir en viss "Separation of concern".
+Har Views som visar saker (innehåller lite logik men mest för att visa saker), Controllers (queries och business logic) och Models (beskriver objekten och vissa limitationer som dessa har).
+
+Övergripande
+------------
+Mycket är redan nämnt. Det är ett projekt, främst klasserna Movie, Studio och MovieStudio som är intressanta men har vissa "aggregates" och även DTO (används i API:t). Inga lager.
+
+Egen bedömning
+--------------
+All funktionalitet som efterfrågas i funktionskraven finns där förutom autentisering för API och uppdelningen kunde varit intressantare och bättre.
+
+Försökte tidigt tänka på något sätt att designa allt men valde att köra på ren MVC till en början och kanske ändra senare (hade tänkt Repository och Services) men blev pga tidsbrist endast MVC-upplägg.
+Hemsidan fungerar men hade velat ha bättre felmeddelanden. Just nu är det bara NotFound() (tom sida) som felmeddelanden vilket inte är något vidare beskrivande för användaren.
+Har tagit bort de mesta try/catch som fanns från början (när man scaffoldat) tillhörandes förfrågningar mot databasen då jag inte kom på något bra sätt att testa dem. Troligen är också sidan inte särskilt användbar för flera klienter samtidigt som använder PUT-action-metoder.
+Eftersom att programmet är monolitiskt och det finns få ställen att lägga logik förutom Controllers så blir det mycket duplicering av kod; API och Views har viss kod som är väldigt snarlik.
+Hade kunnat vara lite mer funktionalitet på hemsidan istället för att också vara beroende av API:t (för t.ex. rating).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
