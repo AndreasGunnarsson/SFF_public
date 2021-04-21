@@ -39,21 +39,21 @@ namespace test_SFF.Controllers
         public async Task<IActionResult> Create([Bind("StudioId, ReturnDate")] MovieStudio movieStudio, int id)
         {
             // Finns tillräckligt många kopior för att låna ut en film?
-            int movieStudioQuery = _context.MovieStudios.Where(x => x.MovieId == id).Count();
+            int movieStudioQuery = _context.MovieStudios.Where(x => x.MovieId == id && x.Returned == false).Count();
             Movie movieQuery = await _context.Movies.FindAsync(id);
             if (movieQuery == null)
                 return NotFound();
             if (movieStudioQuery >= movieQuery.TotalAmount)
                 return BadRequest();
 
-            // Har samma studio lånat samma film en gång tidigare?
-            bool isNotDuplicates = false;
-            isNotDuplicates = _context.MovieStudios.Any(x => x.MovieId == id && x.StudioId == movieStudio.StudioId);
-            if (isNotDuplicates == true)
+            // Har samma studio lånat samma film en gång tidigare utan att returnera?
+            bool isDuplicates = false;
+            isDuplicates = _context.MovieStudios.Any(x => x.MovieId == id && x.StudioId == movieStudio.StudioId && x.Returned == false);
+            if (isDuplicates == true)
                 return BadRequest();
 
             // Är datumet efter dagens datum?
-            if (movieStudio.ReturnDate <= DateTime.Now)
+            if (movieStudio.ReturnDate <= DateTime.Now.Date)
                 return BadRequest();
 
             MovieStudio moviestudioobject = new MovieStudio

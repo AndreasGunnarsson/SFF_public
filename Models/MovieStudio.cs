@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace test_SFF
 {
@@ -9,6 +10,7 @@ namespace test_SFF
         public Movie Movie { get; set; }
         public int StudioId { get; set; }
         public Studio Studio { get; set; }
+        [DataType(DataType.Date)]
         public DateTime ReturnDate { get; set; }
         public bool Returned { get; set; }
         public string Review { get; set; }
